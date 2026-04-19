@@ -51,3 +51,16 @@ app.*.map.json
 .env
 google-services.json
 GoogleService-Info.plist
+
+
+# --- OkeyMaster Custom Ignores ---
+
+# Backend Server Environment Variables (Kritik Güvenlik!)
+okey-master-server/.env
+okey-master-server/node_modules/
+
+# Mac OS Gizli Dosyaları (Kişi 1 veya 2 Mac kullanıyorsa çöp dosya atmamaları için)
+.DS_Store
+
+# Flutter Firebase Crashlytics/Performance (Varsa)
+*.firebase/
