@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart'; // YENİ
+import 'firebase_options.dart'; // YENİ
 import 'services/save_service.dart';
 import 'providers/service_providers.dart';
-
 void main() async {
-  // Flutter binding'lerini başlat (Arka planda sistemle iletişim kurabilmek için şart)
   WidgetsFlutterBinding.ensureInitialized();
-
+  // Firebase'i başlat
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // SaveService'i asenkron olarak başlat
   final saveService = SaveService();
   await saveService.init();
-
   runApp(
-    // Riverpod ProviderScope ile uygulamayı sarıyoruz.
-    // Uygulama başlarken boş bıraktığımız provider'ı gerçek çalışan servisimizle eziyoruz (override)
     ProviderScope(
       overrides: [
         saveServiceProvider.overrideWithValue(saveService),
