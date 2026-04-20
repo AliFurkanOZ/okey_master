@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String   @id @default(uuid())
+  firebaseUid String   @unique @map("firebase_uid")
+  username    String
+  email       String?
+  avatarUrl   String?  @map("avatar_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  lastLogin   DateTime @default(now()) @map("last_login")
+
+  stats        UserStats?
+  gamePlayers  GamePlayer[]
+  achievements UserAchievement[]
+  leaderboard  Leaderboard[]
+  wonGames     Game[]  @relation("GameWinner")
+
+  @@map("users")
+}
+
+model Game {
+  id              String    @id @default(uuid())
+  mode            String
+  status          String    @default("playing")
+  winnerId        String?   @map("winner_id")
+  serverSeed      String?   @map("server_seed")
+  totalTurns      Int       @default(0) @map("total_turns")
+  durationSeconds Int       @default(0) @map("duration_seconds")
+  startedAt       DateTime? @map("started_at")
+  endedAt         DateTime? @map("ended_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  winner  User?        @relation("GameWinner", fields: [winnerId], references: [id])
+  players GamePlayer[]
+
+  @@index([mode, status])
+  @@map("games")
+}
+
+model GamePlayer {
+  id             String  @id @default(uuid())
+  gameId         String  @map("game_id")
+  userId         String  @map("user_id")
+  score          Int     @default(0)
+  tilesRemaining Int     @default(14) @map("tiles_remaining")
+  isWinner       Boolean @default(false) @map("is_winner")
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([gameId, userId])
+  @@map("game_players")
+}
+
+model UserStats {
+  id                   String  @id @default(uuid())
+  userId               String  @unique @map("user_id")
+  totalGames           Int     @default(0) @map("total_games")
+  totalWins            Int     @default(0) @map("total_wins")
+  totalLosses          Int     @default(0) @map("total_losses")
+  winStreak            Int     @default(0) @map("win_streak")
+  bestWinStreak        Int     @default(0) @map("best_win_streak")
+  avgScore             Float   @default(0) @map("avg_score")
+  totalPlayTimeMinutes Int     @default(0) @map("total_play_time_minutes")
+  rank                 String  @default("bronze")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_stats")
+}
+
+model Achievement {
+  id             String @id @default(uuid())
+  name           String
+  description    String?
+  iconUrl        String? @map("icon_url")
+  conditionType  String  @map("condition_type")
+  conditionValue Int     @map("condition_value")
+
+  users UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  achievementId String   @map("achievement_id")
+  unlockedAt    DateTime @default(now()) @map("unlocked_at")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model Leaderboard {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  period    String
+  score     Int      @default(0)
+  rank      Int?
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, period])
+  @@map("leaderboard")
+}
+
+model IdempotencyKeys {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  response  Json
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("idempotency_keys")
+}
