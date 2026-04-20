@@ -6,6 +6,10 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/auth.routes');
 const gameRoutes = require('./routes/game.routes');
+const statsRoutes = require('./routes/stats.routes');
+const leaderboardRoutes = require('./routes/leaderboard.routes');
+const achievementRoutes = require('./routes/achievement.routes');
+
 
 const app = express();
 
@@ -25,6 +29,10 @@ app.use('/api/', limiter);
 // Routes (Bağlantı Yolları)
 app.use('/api/auth', authRoutes);
 app.use('/api/games', gameRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/achievements', achievementRoutes);
+
 
 // Health Check (Sunucu ayakta mı diye kontrol eden nabız noktası)
 app.get('/api/health', (req, res) => res.json({ status: 'OK' }));
