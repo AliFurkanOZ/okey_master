@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "build": "npx prisma generate",
+    "deploy": "npx prisma migrate deploy && node src/index.js",
     "test": "jest"
   },
+
   "keywords": [],
   "author": "",
   "license": "ISC",
