@@ -1,0 +1,20 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+
+# Ana dizindeki ve alt dizinlerdeki tüm node_modules klasörlerini engeller
+**/node_modules/
+node_modules/
+
+# Server içindeki Prisma tarafından üretilen dosyalar
+**/generated/prisma/
+okey-master-server/generated/prisma/
+
+# Local ortam değişkenleri (Şifreler vb.)
+.env
+okey-master-server/.env
+
+# --- DİĞER ---
+okey-master-server.zip

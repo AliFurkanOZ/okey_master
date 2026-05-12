@@ -1,0 +1,10 @@
+newmtl taş_asıl_rengi,
+Kd 0.9372549 0.9372549 0.9098039
+d 1
+
+newmtl siyah13_kalıp
+bump 12_siyah yeni hali_normal (1).png
+map_Kd 12_siyah yeni hali.png
+Kd 1 1 1
+d 1
+
