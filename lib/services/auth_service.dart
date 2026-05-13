@@ -1,0 +1,50 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+class AuthService {
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
+  static final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  // Mevcut kullanıcıyı getir
+  static User? get currentUser => _auth.currentUser;
+
+  // Anonim (Misafir) Girişi
+  static Future<UserCredential> signInAsGuest() async {
+    try {
+      return await _auth.signInAnonymously();
+    } catch (e) {
+      throw Exception("Misafir girişi başarısız: $e");
+    }
+  }
+
+  // Google ile Giriş
+  static Future<UserCredential> signInWithGoogle() async {
+    try {
+      // Google hesap seçiciyi aç
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        throw Exception("Giriş iptal edildi.");
+      }
+
+      // Kimlik doğrulama detaylarını al
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Firebase credential oluştur
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Firebase'e giriş yap
+      return await _auth.signInWithCredential(credential);
+    } catch (e) {
+      throw Exception("Google ile giriş başarısız: $e");
+    }
+  }
+
+  // Çıkış Yap
+  static Future<void> signOut() async {
+    await _googleSignIn.signOut();
+    await _auth.signOut();
+  }
+}

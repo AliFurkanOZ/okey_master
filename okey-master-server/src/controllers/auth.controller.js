@@ -21,7 +21,9 @@ const register = async (req, res, next) => {
       update: { lastLogin: new Date() },
       create: {
         firebaseUid,
-        username: username,
+        username: username || req.user.name || 'Oyuncu',
+        email: req.user.email || null,
+        avatarUrl: req.user.picture || null,
         stats: { create: {} },
       },
       include: { stats: true },

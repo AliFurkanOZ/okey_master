@@ -36,9 +36,9 @@ const createGame = async (req, res, next) => {
       }
     });
     if (activeGamesCount >= 3) {
-       return res.status(400).json({ error: 'Çok fazla aktif oyununuz var' });
+      return res.status(400).json({ error: 'Çok fazla aktif oyununuz var' });
     }
-    
+
     // serverSeed üret ve hash'ini (commitment) istemciye dön
     const serverSeed = crypto.randomBytes(32).toString('hex');
     const seedCommitment = crypto.createHash('sha256').update(serverSeed).digest('hex');
@@ -65,7 +65,7 @@ const finishGame = async (req, res, next) => {
     }
     const { id } = req.params;
     const { winnerId, players, totalTurns, gameHash, moveLog } = req.body;
-    
+
     // 1. Idempotency Key kontrolü
     const idempotencyKey = req.headers['x-idempotency-key'];
     if (idempotencyKey) {
@@ -107,7 +107,7 @@ const finishGame = async (req, res, next) => {
     if (playerScore > MAX_REASONABLE_SCORE) {
       return res.status(400).json({ error: 'Gerçekçi olmayan skor' });
     }
-    
+
     // 2. Süre kontrolü
     const durationSec = Math.floor((new Date() - existingGame.startedAt) / 1000);
     if (durationSec < MIN_GAME_DURATION_SEC || durationSec > MAX_GAME_DURATION_SEC) {
@@ -143,9 +143,9 @@ const finishGame = async (req, res, next) => {
 
         const isDraw = (winnerId === null || winnerId === undefined || winnerId === 'ai');
 
-        const newWinStreak = p.isWinner === true 
-            ? stats.winStreak + 1 
-            : (isDraw ? stats.winStreak : 0);
+        const newWinStreak = p.isWinner === true
+          ? stats.winStreak + 1
+          : (isDraw ? stats.winStreak : 0);
 
         await tx.userStats.update({
           where: { userId: p.userId },
@@ -186,14 +186,14 @@ const getHistory = async (req, res, next) => {
       take: limit,
     });
     res.json(games);
-  } catch(err) { next(err); }
+  } catch (err) { next(err); }
 };
 
 const saveGameResult = async (req, res) => {
   try {
-    const { username, isWin, duration, gameType } = req.body;
-    const user = await prisma.user.findFirst({ where: { username }, include: { stats: true } });
-    
+    const { isWin, duration, gameType } = req.body;
+    const user = await prisma.user.findUnique({ where: { firebaseUid: req.user.uid }, include: { stats: true } });
+
     if (!user) return res.status(404).json({ error: "Kullanıcı bulunamadı" });
 
     let pointsToAdd = 0;
