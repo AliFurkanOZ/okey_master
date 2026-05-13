@@ -13,8 +13,8 @@ const register = async (req, res, next) => {
 
     const { username } = req.body;
     
-    // BURASI ÇOK ÖNEMLİ: req.user yoksa test UID oluştur diyoruz
-    const firebaseUid = (req.user && req.user.uid) ? req.user.uid : `test_user_${username}`;
+    // BURASI ÇOK ÖNEMLİ: req.user.uid zorunlu kılındı (güvenlik yaması)
+    const firebaseUid = req.user.uid;
 
     const user = await prisma.user.upsert({
       where: { firebaseUid },

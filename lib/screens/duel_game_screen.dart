@@ -3,7 +3,7 @@ import 'dart:math';
 import '../models/okey_stone.dart';
 import '../widgets/stone_widget.dart';
 import '../services/api_service.dart';
-
+import '../services/sync_queue_service.dart';
 class DuelGameScreen extends StatefulWidget {
   final String nickname;
   final bool isBotMode;
@@ -43,7 +43,12 @@ class _DuelGameScreenState extends State<DuelGameScreen> {
         deck.add(OkeyStone(path: 'assets/images/${c}_$i.png', id: '${c}_${i}_${Random().nextInt(1000)}', value: i, color: c));
       }
     }
-    deck.shuffle();
+    // Fisher-Yates + Random.secure() (kriptografik güvenli)
+    final rng = Random.secure();
+    for (int i = deck.length - 1; i > 0; i--) {
+      final j = rng.nextInt(i + 1);
+      final temp = deck[i]; deck[i] = deck[j]; deck[j] = temp;
+    }
     setState(() {
       winner = null;
       isPlayerTurn = true;
@@ -91,12 +96,24 @@ class _DuelGameScreenState extends State<DuelGameScreen> {
   void _determineNextTurn() async {
     if (_checkWin(playerCols)) { 
       winner = p1Name; 
-      if(widget.isBotMode) await ApiService.sendResult(nickname: widget.nickname, isWin: true, type: "duel");
+      if(widget.isBotMode) {
+        try {
+          await ApiService.sendResult(nickname: widget.nickname, isWin: true, type: "duel");
+        } catch (e) {
+          await SyncQueueService.enqueue({"nickname": widget.nickname, "isWin": true, "type": "duel"});
+        }
+      }
       _showVictoryDialog(); return; 
     }
     if (_checkWin(opponentCols)) { 
       winner = p2Name; 
-      if(widget.isBotMode) await ApiService.sendResult(nickname: widget.nickname, isWin: false, type: "duel");
+      if(widget.isBotMode) {
+        try {
+          await ApiService.sendResult(nickname: widget.nickname, isWin: false, type: "duel");
+        } catch (e) {
+          await SyncQueueService.enqueue({"nickname": widget.nickname, "isWin": false, "type": "duel"});
+        }
+      }
       _showVictoryDialog(); return; 
     }
     

@@ -1,10 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
+import 'services/save_service.dart';
 import 'screens/login_screen.dart';
 import 'screens/duel_game_screen.dart';
 import 'screens/memory_game_screen.dart';
 import 'screens/leaderboard_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 1. Firebase başlat
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    // 2. Firebase anonim giriş (kullanıcı ilk kez açıyorsa)
+    if (FirebaseAuth.instance.currentUser == null) {
+      await FirebaseAuth.instance.signInAnonymously();
+    }
+  } catch (e) {
+    debugPrint('Firebase başlatma hatası: $e');
+  }
+
+  // 3. SaveService başlat
+  final saveService = SaveService();
+  await saveService.init();
+
   runApp(const OkeyApp());
 }
 

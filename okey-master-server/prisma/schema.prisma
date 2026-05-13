@@ -64,7 +64,12 @@ model UserStats {
   userId               String   @unique @map("user_id")
   totalGames           Int      @default(0) @map("total_games")
   totalWins            Int      @default(0) @map("total_wins")
+  totalLosses          Int      @default(0) @map("total_losses")       // YENİ
+  winStreak            Int      @default(0) @map("win_streak")         // YENİ
+  bestWinStreak        Int      @default(0) @map("best_win_streak")    // YENİ
   avgScore             Int      @default(0) @map("avg_score") // Okey Puanı
+  totalPlayTimeMinutes Int      @default(0) @map("total_play_time_minutes") // YENİ
+  rank                 String   @default("bronze")                     // YENİ
   
   // Hafıza Oyunu Rekorları (Saniye cinsinden)
   bestTimeEasy         Int      @default(0) @map("best_time_easy")

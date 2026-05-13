@@ -5,7 +5,7 @@ const authController = require('../controllers/auth.controller');
 const router = express.Router();
 
 // Gelen her isteğin önüne "verifyToken" kapısını koyuyoruz
-router.post('/register',  authController.registerValidation, authController.register);
+router.post('/register', verifyToken, authController.registerValidation, authController.register);
 router.get('/profile', verifyToken, authController.getProfile);
 router.post('/migrate', verifyToken, authController.migrate);
 

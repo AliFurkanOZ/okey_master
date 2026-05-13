@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "231732726070",
+    "project_id": "okeymaster-f93b9",
+    "storage_bucket": "okeymaster-f93b9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:231732726070:android:ea0ccd7553b5e448aacb97",
+        "android_client_info": {
+          "package_name": "com.teamname.okey_master"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBhrAueqeQ0i2RiJIi0IyKJg0o56-cad4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
