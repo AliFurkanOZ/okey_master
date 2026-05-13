@@ -65,11 +65,15 @@ class ApiService {
           "gameType": type
         }),
       ).timeout(const Duration(seconds: 10));
+      
+      print("SERVER RESULT STATUS: ${response.statusCode}");
+      print("SERVER RESULT BODY: ${response.body}");
+      
       if (response.statusCode >= 300) {
          throw ApiException("Sunucu Hatası", statusCode: response.statusCode);
       }
     } catch (e) {
-      print("Veri gönderilemedi: $e");
+      print("!!! Veri gönderilemedi !!! HATA: $e");
       throw ApiException("İnternet bağlantısı yok veya sunucuya ulaşılamadı.");
     }
   }

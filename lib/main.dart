@@ -17,10 +17,8 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    // 2. Firebase anonim giriş (kullanıcı ilk kez açıyorsa)
-    if (FirebaseAuth.instance.currentUser == null) {
-      await FirebaseAuth.instance.signInAnonymously();
-    }
+    // Auth durumuna göre yönlendirme mantığı LoginScreen içinde veya burada yapılacak
+    // Önceden burada olan signInAnonymously kaldırıldı.
   } catch (e) {
     debugPrint('Firebase başlatma hatası: $e');
   }

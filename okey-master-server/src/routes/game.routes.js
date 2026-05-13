@@ -8,6 +8,6 @@ router.post('/:id/finish', verifyToken, gameController.finishGameValidation, gam
 router.get('/history', verifyToken, gameController.getHistory);
 
 // router.post için İKİNCİ parametrenin bir fonksiyon olduğundan eminiz
-router.post('/result', gameController.saveGameResult);
+router.post('/result', verifyToken, gameController.saveGameResult);
 
 module.exports = router;
