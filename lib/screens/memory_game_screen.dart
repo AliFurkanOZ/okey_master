@@ -4,7 +4,7 @@ import 'dart:async'; // Timer için gerekli
 import '../models/okey_stone.dart';
 import '../widgets/stone_widget.dart';
 import '../services/api_service.dart';
-
+import '../services/sync_queue_service.dart';
 enum BotDifficulty { easy, medium, hard }
 
 class OkeyMemoryGame extends StatefulWidget {
@@ -178,7 +178,7 @@ class _OkeyMemoryGameState extends State<OkeyMemoryGame> {
   }
 
   // --- OYUN BİTİŞİ VE VERİ GÖNDERİMİ ---
-  void _checkWin() {
+  void _checkWin() async {
     if (playerScore + opponentScore == 16) {
       _stopwatch.stop();
       _timer?.cancel();
@@ -187,12 +187,21 @@ class _OkeyMemoryGameState extends State<OkeyMemoryGame> {
       // SUNUCUYA REKORU GÖNDERİYORUZ
       if (widget.isBotMode) {
         String diffString = difficulty.toString().split('.').last;
-        ApiService.sendResult(
-          nickname: widget.nickname,
-          isWin: playerScore > opponentScore,
-          duration: finalTime,
-          type: "memory_$diffString"
-        );
+        try {
+          await ApiService.sendResult(
+            nickname: widget.nickname,
+            isWin: playerScore > opponentScore,
+            duration: finalTime,
+            type: "memory_$diffString"
+          );
+        } catch (e) {
+          await SyncQueueService.enqueue({
+            "nickname": widget.nickname,
+            "isWin": playerScore > opponentScore,
+            "duration": finalTime,
+            "type": "memory_$diffString"
+          });
+        }
       }
 
       String winnerText = playerScore > opponentScore ? "TEBRİKLER, KAZANDIN!" : (opponentScore > playerScore ? "BOT KAZANDI!" : "BERABERE!");
@@ -212,9 +221,6 @@ class _OkeyMemoryGameState extends State<OkeyMemoryGame> {
       );
     }
   }
-
-  // --- TEST AMAÇLI BİTİRME BUTONU İÇİN ---
-  void _finishGame(bool win) => _checkWin(); 
 
   @override
   Widget build(BuildContext context) {
@@ -265,8 +271,6 @@ class _OkeyMemoryGameState extends State<OkeyMemoryGame> {
           return Expanded(child: GestureDetector(onTap: () => _onCardTap(index), child: Container(margin: const EdgeInsets.all(2.5), child: FittedBox(fit: BoxFit.contain, child: StoneFlipWrapper(key: ValueKey(cards[index].id), stone: cards[index])))));
         })));
       })))),
-      // TEST BUTONU (İstersen silebilirsin)
-      ElevatedButton(onPressed: () => _finishGame(true), child: const Text("TEST: OYUNU BİTİR"))
     ]);
   }
 }

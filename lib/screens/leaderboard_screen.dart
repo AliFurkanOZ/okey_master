@@ -39,36 +39,88 @@ class LeaderboardScreen extends StatelessWidget {
   }
 }
 
-class _RankList extends StatelessWidget {
+class _RankList extends StatefulWidget {
   final String category;
   const _RankList({required this.category});
 
   @override
+  State<_RankList> createState() => _RankListState();
+}
+
+class _RankListState extends State<_RankList> {
+  late Future<List<dynamic>> _leaderboardFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() {
+    _leaderboardFuture = ApiService.getLeaderboard(widget.category);
+  }
+
+  Future<void> _handleRefresh() async {
+    setState(() {
+      _loadData();
+    });
+    await _leaderboardFuture;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<dynamic>>(
-      future: ApiService.getLeaderboard(category),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-        final list = snapshot.data!;
-        
-        return ListView.builder(
-          itemCount: list.length,
-          itemBuilder: (context, index) {
-            final entry = list[index];
-            // NULL KONTROLÜ: Eğer score null ise 0 kabul et
-            final double score = (entry['score'] ?? 0).toDouble();
-            
-            return ListTile(
-              leading: CircleAvatar(child: Text("${index + 1}")),
-              title: Text(entry['nickname'] ?? "İsimsiz", style: const TextStyle(color: Colors.white)),
-              trailing: Text(
-                category == "duel" ? "$score Puan" : "${(score).toStringAsFixed(1)} sn",
-                style: const TextStyle(color: Colors.amber),
-              ),
+    return RefreshIndicator(
+      onRefresh: _handleRefresh,
+      child: FutureBuilder<List<dynamic>>(
+        future: _leaderboardFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Veriler yüklenemedi.", style: TextStyle(color: Colors.red)),
+                  ElevatedButton(
+                    onPressed: _handleRefresh, 
+                    child: const Text("Tekrar Dene")
+                  )
+                ]
+              )
             );
-          },
-        );
-      },
+          }
+          final list = snapshot.data ?? [];
+          if (list.isEmpty) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                const Center(child: Text("Henüz sıralama yok.", style: TextStyle(color: Colors.white70))),
+              ]
+            );
+          }
+          
+          return ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: list.length,
+            itemBuilder: (context, index) {
+              final entry = list[index];
+              final double score = (entry['score'] ?? 0).toDouble();
+              
+              return ListTile(
+                leading: CircleAvatar(child: Text("${index + 1}")),
+                title: Text(entry['nickname'] ?? "İsimsiz", style: const TextStyle(color: Colors.white)),
+                trailing: Text(
+                  widget.category == "duel" ? "$score Puan" : "${(score).toStringAsFixed(1)} sn",
+                  style: const TextStyle(color: Colors.amber),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

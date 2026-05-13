@@ -1,4 +1,4 @@
-package com.example.okey_mobil
+package com.teamname.okey_master
 
 import io.flutter.embedding.android.FlutterActivity
 
