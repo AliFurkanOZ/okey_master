@@ -333,12 +333,13 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
 
             const SizedBox(height: 40),
-            _lobbyButton("DÜELLO (2 OYUNCU)", "duel_2p", Icons.people),
-            _lobbyButton("HAFIZA (2 OYUNCU)", "memory_2p", Icons.psychology),
+            _lobbyButton("DÜELLO (LOKAL)", "duel_2p", Icons.people),
+            _lobbyButton("DÜELLO (ONLİNE)", "duel_online", Icons.public),
+            _lobbyButton("HAFIZA (LOKAL)", "memory_2p", Icons.psychology),
             const Divider(color: Colors.white24, indent: 50, endIndent: 50, height: 40),
             _lobbyButton("DÜELLO (BOT)", "duel_bot", Icons.smart_toy),
             _lobbyButton("HAFIZA (BOT)", "memory_bot", Icons.memory),
-            const SizedBox(height: 10),
+            _lobbyButton("PROFİLİM", "profile", Icons.person_outline),
             _lobbyButton("LİDERLİK TABLOSU", "leaderboard", Icons.emoji_events),
             const SizedBox(height: 40),
             TextButton.icon(

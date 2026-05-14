@@ -7,6 +7,10 @@ import 'screens/login_screen.dart';
 import 'screens/duel_game_screen.dart';
 import 'screens/memory_game_screen.dart';
 import 'screens/leaderboard_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/online_duel_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'services/audio_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +31,9 @@ void main() async {
   final saveService = SaveService();
   await saveService.init();
 
+  // BGM (Arka Plan Müziği) Başlat
+  AudioService.playBGM();
+
   runApp(const OkeyApp());
 }
 
@@ -39,8 +46,16 @@ class OkeyApp extends StatelessWidget {
       title: 'Okey Arcade',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.brown,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.amber,
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: const Color(0xFF1E1E1E),
         useMaterial3: true,
+        textTheme: GoogleFonts.outfitTextTheme(Theme.of(context).textTheme).apply(
+          bodyColor: Colors.white,
+          displayColor: Colors.amber,
+        ),
       ),
       home: const OkeyAppFlow(),
     );
@@ -81,6 +96,12 @@ class _OkeyAppFlowState extends State<OkeyAppFlow> {
         onExit: () => changeScreen(userNickname, "login")
       );
     }
+    if (currentScreen == "duel_online") {
+      return OnlineDuelScreen(
+        nickname: userNickname,
+        onExit: () => changeScreen(userNickname, "login")
+      );
+    }
     if (currentScreen == "duel_bot") {
       return DuelGameScreen(
         nickname: userNickname, 
@@ -105,9 +126,15 @@ class _OkeyAppFlowState extends State<OkeyAppFlow> {
       );
     }
 
-    // 4. LİDERLİK TABLOSU
+    // 4. LİDERLİK TABLOSU VE PROFİL
     if (currentScreen == "leaderboard") {
       return LeaderboardScreen(
+        onExit: () => changeScreen(userNickname, "login")
+      );
+    }
+    if (currentScreen == "profile") {
+      return ProfileScreen(
+        nickname: userNickname,
         onExit: () => changeScreen(userNickname, "login")
       );
     }

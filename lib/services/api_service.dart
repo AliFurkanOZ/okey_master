@@ -104,4 +104,32 @@ class ApiService {
     }
     return [];
   }
+
+  // 6. PROFİL VE İSTATİSTİKLER
+  static Future<Map<String, dynamic>?> getMyStats() async {
+    try {
+      final res = await http.get(
+        Uri.parse("$_baseUrl/stats/me"),
+        headers: await _headers(),
+      ).timeout(const Duration(seconds: 10));
+      if (res.statusCode == 200) return jsonDecode(res.body);
+    } catch (e) {
+      print("İstatistik çekilemedi: $e");
+    }
+    return null;
+  }
+
+  // 7. BAŞARIMLAR
+  static Future<List<dynamic>> getMyAchievements() async {
+    try {
+      final res = await http.get(
+        Uri.parse("$_baseUrl/achievements/me"),
+        headers: await _headers(),
+      ).timeout(const Duration(seconds: 10));
+      if (res.statusCode == 200) return jsonDecode(res.body);
+    } catch (e) {
+      print("Başarımlar çekilemedi: $e");
+    }
+    return [];
+  }
 }

@@ -23,6 +23,10 @@ dependencies:
   connectivity_plus: ^7.1.1
   equatable: ^2.0.8
   crypto: ^3.0.3
+  socket_io_client: ^3.1.4
+  google_fonts: ^8.1.0
+  audioplayers: ^6.6.0
+  confetti: ^0.8.0
 
 dev_dependencies:
   flutter_test:

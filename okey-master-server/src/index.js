@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
+const socketIo = require('socket.io');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cron = require('node-cron');
@@ -15,7 +17,16 @@ const achievementRoutes = require('./routes/achievement.routes');
 
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+});
 
+// Socket config yükle
+require('./config/socket')(io);
 // Proxy arkasında çalışıyorsak (Railway vb.) zorunlu
 app.set('trust proxy', 1);
 
@@ -73,7 +84,7 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Sunucu ${PORT} portunda çalışıyor.`));
+server.listen(PORT, () => console.log(`Sunucu ${PORT} portunda çalışıyor.`));
 
 // Periyodik bakım görevleri (Cron Jobs)
 // Her 5 dakikada bir Materialized View yenile (leaderboard)
