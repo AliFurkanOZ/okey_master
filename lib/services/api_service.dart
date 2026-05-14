@@ -20,6 +20,8 @@ class ApiService {
     return {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
+      'Bypass-Tunnel-Reminder': 'true',
+      'ngrok-skip-browser-warning': 'true',
     };
   }
 
