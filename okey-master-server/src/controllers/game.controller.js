@@ -192,9 +192,17 @@ const getHistory = async (req, res, next) => {
 const saveGameResult = async (req, res) => {
   try {
     const { isWin, duration, gameType } = req.body;
+    
+    console.log(`[saveGameResult] Gelen istek: uid=${req.user.uid}, gameType=${gameType}, isWin=${isWin}, duration=${duration}`);
+    
     const user = await prisma.user.findUnique({ where: { firebaseUid: req.user.uid }, include: { stats: true } });
 
-    if (!user) return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+    if (!user) {
+      console.error(`[saveGameResult] Kullanıcı bulunamadı! uid=${req.user.uid}`);
+      return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+    }
+
+    console.log(`[saveGameResult] Kullanıcı bulundu: id=${user.id}, username=${user.username}, stats=${user.stats ? 'VAR' : 'YOK'}`);
 
     let pointsToAdd = 0;
     if (gameType === "duel") pointsToAdd = isWin ? 50 : 20;
@@ -205,16 +213,16 @@ const saveGameResult = async (req, res) => {
       avgScore: { increment: pointsToAdd }
     };
 
-    if (gameType.startsWith("memory") && isWin) {
+    if (gameType && gameType.startsWith("memory") && isWin) {
       const fieldMap = { "memory_easy": "bestTimeEasy", "memory_medium": "bestTimeMedium", "memory_hard": "bestTimeHard" };
       const field = fieldMap[gameType];
-      if (field) {
+      if (field && duration) {
         const currentBest = user.stats ? user.stats[field] : 0;
         if (currentBest === 0 || duration < currentBest) updateData[field] = duration;
       }
     }
 
-    await prisma.userStats.upsert({
+    const result = await prisma.userStats.upsert({
       where: { userId: user.id },
       update: updateData,
       create: {
@@ -222,13 +230,18 @@ const saveGameResult = async (req, res) => {
         totalGames: 1,
         totalWins: isWin ? 1 : 0,
         avgScore: pointsToAdd,
-        bestTimeEasy: gameType === "memory_easy" ? duration : 0,
-        bestTimeMedium: gameType === "memory_medium" ? duration : 0,
-        bestTimeHard: gameType === "memory_hard" ? duration : 0,
+        bestTimeEasy: gameType === "memory_easy" && duration ? duration : 0,
+        bestTimeMedium: gameType === "memory_medium" && duration ? duration : 0,
+        bestTimeHard: gameType === "memory_hard" && duration ? duration : 0,
       }
     });
-    res.json({ success: true });
-  } catch (error) { res.status(500).json({ error: error.message }); }
+    
+    console.log(`[saveGameResult] Başarılı! username=${user.username}, yeni avgScore=${result.avgScore}, totalGames=${result.totalGames}`);
+    res.json({ success: true, avgScore: result.avgScore });
+  } catch (error) {
+    console.error(`[saveGameResult] HATA:`, error);
+    res.status(500).json({ error: error.message });
+  }
 };
 
 module.exports = { createGame, finishGame, getHistory, createGameValidation, finishGameValidation, saveGameResult };

@@ -188,13 +188,16 @@ class _OkeyMemoryGameState extends State<OkeyMemoryGame> {
       if (widget.isBotMode) {
         String diffString = difficulty.toString().split('.').last;
         try {
+          debugPrint('[MemoryGame] Sonuç gönderiliyor... type=memory_$diffString, isWin=${playerScore > opponentScore}, duration=$finalTime');
           await ApiService.sendResult(
             nickname: widget.nickname,
             isWin: playerScore > opponentScore,
             duration: finalTime,
             type: "memory_$diffString"
           );
+          debugPrint('[MemoryGame] Sonuç başarıyla gönderildi!');
         } catch (e) {
+          debugPrint('[MemoryGame] Sonuç gönderilemedi, kuyruğa ekleniyor: $e');
           await SyncQueueService.enqueue({
             "nickname": widget.nickname,
             "isWin": playerScore > opponentScore,

@@ -57,13 +57,16 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       // 2. Sunucuya Kayıt
-      int statusCode = await ApiService.registerPlayer(nick);
+      final result = await ApiService.registerPlayer(nick);
+      final int statusCode = result['status'] as int;
+      final String? assignedUsername = result['username'] as String?;
 
       if (statusCode == 201 || statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('user_nick', nick);
+        final actualNick = assignedUsername ?? nick;
+        await prefs.setString('user_nick', actualNick);
         setState(() {
-          registeredNick = nick;
+          registeredNick = actualNick;
           isGuestMode = false;
         });
       } else if (statusCode == 409) {
@@ -91,12 +94,21 @@ class _LoginScreenState extends State<LoginScreen> {
       String nick = user.displayName ?? "Oyuncu_${user.uid.substring(0, 5)}";
 
       // 2. Sunucuya Kayıt (Google bilgilerini sunucu otomatik alacak)
-      int statusCode = await ApiService.registerPlayer(nick);
+      final result = await ApiService.registerPlayer(nick);
+      final int statusCode = result['status'] as int;
+      final String? assignedUsername = result['username'] as String?;
 
       if (statusCode == 201 || statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('user_nick', nick);
-        setState(() => registeredNick = nick);
+        final actualNick = assignedUsername ?? nick;
+        await prefs.setString('user_nick', actualNick);
+        setState(() => registeredNick = actualNick);
+      } else if (statusCode == 409) {
+        _showError("Google isminiz sistemde başka birine ait! Lütfen farklı bir takma isim belirleyin.");
+        setState(() {
+          isGuestMode = true;
+          _nickController.text = nick;
+        });
       } else {
         _showError("Sunucu Hatası ($statusCode)!");
       }

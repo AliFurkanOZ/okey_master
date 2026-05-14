@@ -24,16 +24,22 @@ class ApiService {
   }
 
   // 1. Kayıt Metodu
-  static Future<int> registerPlayer(String nickname) async {
+  static Future<Map<String, dynamic>> registerPlayer(String nickname) async {
     try {
       final response = await http.post(
         Uri.parse("$_baseUrl/auth/register"),
         headers: await _headers(),
         body: jsonEncode({"username": nickname}),
       ).timeout(const Duration(seconds: 10));
-      return response.statusCode;
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        return {'status': response.statusCode, 'username': data['username']};
+      } else {
+        return {'status': response.statusCode, 'username': null};
+      }
     } catch (e) {
-      return 500;
+      return {'status': 500, 'username': null};
     }
   }
 
@@ -55,26 +61,33 @@ class ApiService {
     required String type
   }) async {
     try {
+      final headers = await _headers();
+      final body = jsonEncode({
+        "username": nickname,
+        "isWin": isWin,
+        "duration": duration,
+        "gameType": type
+      });
+      
+      print("[ApiService.sendResult] İstek gönderiliyor: $_baseUrl/games/result");
+      print("[ApiService.sendResult] Body: $body");
+      print("[ApiService.sendResult] Token: ${headers['Authorization']?.substring(0, 30)}...");
+      
       final response = await http.post(
         Uri.parse("$_baseUrl/games/result"),
-        headers: await _headers(),
-        body: jsonEncode({
-          "username": nickname,
-          "isWin": isWin,
-          "duration": duration,
-          "gameType": type
-        }),
+        headers: headers,
+        body: body,
       ).timeout(const Duration(seconds: 10));
       
-      print("SERVER RESULT STATUS: ${response.statusCode}");
-      print("SERVER RESULT BODY: ${response.body}");
+      print("[ApiService.sendResult] STATUS: ${response.statusCode}");
+      print("[ApiService.sendResult] BODY: ${response.body}");
       
       if (response.statusCode >= 300) {
-         throw ApiException("Sunucu Hatası", statusCode: response.statusCode);
+         throw ApiException("Sunucu Hatası: ${response.body}", statusCode: response.statusCode);
       }
     } catch (e) {
-      print("!!! Veri gönderilemedi !!! HATA: $e");
-      throw ApiException("İnternet bağlantısı yok veya sunucuya ulaşılamadı.");
+      print("[ApiService.sendResult] !!! HATA !!! $e");
+      throw ApiException("İnternet bağlantısı yok veya sunucuya ulaşılamadı: $e");
     }
   }
 
