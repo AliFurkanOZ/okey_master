@@ -89,8 +89,8 @@ class _DuelGameScreenState extends State<DuelGameScreen> {
       exiting.isRevealed = true;
       stagedStone = exiting;
       isAnimating = false;
-      _determineNextTurn();
     });
+    _determineNextTurn();
   }
 
   void _determineNextTurn() async {
@@ -98,8 +98,11 @@ class _DuelGameScreenState extends State<DuelGameScreen> {
       winner = p1Name; 
       if(widget.isBotMode) {
         try {
+          debugPrint('[DuelGame] Oyuncu kazandı! Sonuç gönderiliyor...');
           await ApiService.sendResult(nickname: widget.nickname, isWin: true, type: "duel");
+          debugPrint('[DuelGame] Sonuç başarıyla gönderildi!');
         } catch (e) {
+          debugPrint('[DuelGame] Sonuç gönderilemedi, kuyruğa ekleniyor: $e');
           await SyncQueueService.enqueue({"nickname": widget.nickname, "isWin": true, "type": "duel"});
         }
       }
@@ -109,8 +112,11 @@ class _DuelGameScreenState extends State<DuelGameScreen> {
       winner = p2Name; 
       if(widget.isBotMode) {
         try {
+          debugPrint('[DuelGame] Bot kazandı! Sonuç gönderiliyor...');
           await ApiService.sendResult(nickname: widget.nickname, isWin: false, type: "duel");
+          debugPrint('[DuelGame] Sonuç başarıyla gönderildi!');
         } catch (e) {
+          debugPrint('[DuelGame] Sonuç gönderilemedi, kuyruğa ekleniyor: $e');
           await SyncQueueService.enqueue({"nickname": widget.nickname, "isWin": false, "type": "duel"});
         }
       }

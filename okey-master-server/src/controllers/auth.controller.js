@@ -15,21 +15,57 @@ const register = async (req, res, next) => {
     
     // BURASI ÇOK ÖNEMLİ: req.user.uid zorunlu kılındı (güvenlik yaması)
     const firebaseUid = req.user.uid;
+    const displayName = username || req.user.name || 'Oyuncu';
 
-    const user = await prisma.user.upsert({
+    console.log(`[register] Giriş denemesi: uid=${firebaseUid}, username=${displayName}, email=${req.user.email || 'yok'}`);
+
+    // 1. Kullanıcı zaten varsa, mevcut kullanıcıyı (ismini DEĞİŞTİRMEDEN) döndür
+    const existingUser = await prisma.user.findUnique({
       where: { firebaseUid },
-      update: { lastLogin: new Date() },
-      create: {
+      include: { stats: true }
+    });
+
+    if (existingUser) {
+      // Sadece son giriş tarihini, email ve resmi güncelliyoruz. Username'i ezmiyoruz.
+      const updatedUser = await prisma.user.update({
+        where: { id: existingUser.id },
+        data: {
+          lastLogin: new Date(),
+          email: req.user.email || existingUser.email,
+          avatarUrl: req.user.picture || existingUser.avatarUrl,
+        },
+        include: { stats: true },
+      });
+      console.log(`[register] Mevcut kullanıcı girişi: id=${updatedUser.id}, username=${updatedUser.username}`);
+      return res.json(updatedUser);
+    }
+
+    // 2. Kullanıcı yoksa (yeni kayıt), istenen ismin benzersiz olup olmadığını kontrol et
+    const nameCheck = await prisma.user.findUnique({
+      where: { username: displayName }
+    });
+
+    if (nameCheck) {
+      console.log(`[register] İsim zaten alınmış: ${displayName}`);
+      return res.status(409).json({ error: 'Bu isim zaten alınmış' });
+    }
+
+    // 3. İsim boşta ise yeni kullanıcıyı oluştur
+    const newUser = await prisma.user.create({
+      data: {
         firebaseUid,
-        username: username || req.user.name || 'Oyuncu',
+        username: displayName,
         email: req.user.email || null,
         avatarUrl: req.user.picture || null,
         stats: { create: {} },
       },
       include: { stats: true },
     });
-    res.json(user);
+
+    console.log(`[register] Başarılı yeni kayıt: id=${newUser.id}, username=${newUser.username}`);
+    res.json(newUser);
   } catch (error) {
+    console.error(`[register] HATA:`, error.message);
     next(error);
   }
 };
