@@ -12,10 +12,6 @@ class SocketService {
 
     _socket = IO.io(serverUrl, IO.OptionBuilder()
       .setTransports(['websocket'])
-      .setExtraHeaders({
-        'Bypass-Tunnel-Reminder': 'true',
-        'ngrok-skip-browser-warning': 'true'
-      })
       .disableAutoConnect()
       .build()
     );
