@@ -17,6 +17,24 @@ class AuthService {
     }
   }
 
+  // E-posta ve Şifre ile Giriş
+  static Future<UserCredential> signInWithEmail(String email, String password) async {
+    try {
+      return await _auth.signInWithEmailAndPassword(email: email, password: password);
+    } catch (e) {
+      throw Exception("Giriş başarısız: $e");
+    }
+  }
+
+  // E-posta ve Şifre ile Kayıt
+  static Future<UserCredential> registerWithEmail(String email, String password) async {
+    try {
+      return await _auth.createUserWithEmailAndPassword(email: email, password: password);
+    } catch (e) {
+      throw Exception("Kayıt başarısız: $e");
+    }
+  }
+
   // Google ile Giriş
   static Future<UserCredential> signInWithGoogle() async {
     try {
