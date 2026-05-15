@@ -70,7 +70,7 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
       });
     });
 
-    // Rakip Hamle Yaptı — Sunucudan gelen taş bilgisi ile güncelle
+    // Rakip Hamle Yaptı — Sunucudan gelen taş bilgisi ve sıra bilgisi ile güncelle
     SocketService.on('opponent_move', (data) {
       if (!mounted) return;
       int colIdx = data['colIdx'];
@@ -78,7 +78,9 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
       Map<String, dynamic>? exitingStoneData = data['exitingStone'] != null 
           ? Map<String, dynamic>.from(data['exitingStone']) 
           : null;
-      _applyOpponentMove(colIdx, exitingStoneData);
+      // Sıra bilgisi: rakip bana "sıra sende mi?" diye söylüyor
+      bool? nextTurnIsYours = data['nextTurnIsYours'];
+      _applyOpponentMove(colIdx, exitingStoneData, nextTurnIsYours);
     });
 
     // Rakip Ayrıldı
@@ -160,24 +162,32 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
       exiting.isRevealed = true;
       stagedStone = exiting;
       isAnimating = false;
-      isPlayerTurn = false; // Sırayı rakibe ver
+      // isPlayerTurn burada DEĞİŞTİRİLMİYOR — _determineNextTurn hesaplayacak
     });
     
     AudioService.playStoneMove();
 
-    // Sunucuya hamleyi bildir — çıkan taşın bilgisini de gönder
+    // Önce sırayı hesapla (offline mantıkla)
+    bool nextTurnIsMe = _calculateNextTurn(afterPlayerMove: true);
+    
+    setState(() {
+      isPlayerTurn = nextTurnIsMe;
+    });
+
+    // Sunucuya hamleyi bildir — sıra bilgisini de gönder
     SocketService.emit('game_move', {
       'roomId': roomId,
       'details': {
         'colIdx': colIdx,
         'exitingStone': exiting.toJson(),
+        'nextTurnIsYours': !nextTurnIsMe, // Rakibe "sıra sende mi?" bilgisi
       }
     });
 
-    _determineNextTurn(isAfterPlayerMove: true);
+    _checkForWins(isAfterPlayerMove: true);
   }
 
-  void _applyOpponentMove(int colIdx, Map<String, dynamic>? exitingStoneData) async {
+  void _applyOpponentMove(int colIdx, Map<String, dynamic>? exitingStoneData, bool? nextTurnIsYours) async {
     if (isAnimating || stagedStone == null || winner != null) return;
     
     setState(() { isAnimating = true; });
@@ -203,15 +213,47 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
       }
       
       isAnimating = false;
-      isPlayerTurn = true; // Sıra bize geçti
+      // Sıra bilgisi rakipten geliyor — iki taraf da aynı sonucu kullanıyor
+      isPlayerTurn = nextTurnIsYours ?? true;
     });
     
     AudioService.playStoneMove();
 
-    _determineNextTurn(isAfterPlayerMove: false);
+    _checkForWins(isAfterPlayerMove: false);
   }
 
-  void _determineNextTurn({required bool isAfterPlayerMove}) async {
+  /// Ortadaki taşa göre sıranın kimde olacağını hesapla (offline mantık)
+  /// true = sıra bende, false = sıra rakipte
+  bool _calculateNextTurn({required bool afterPlayerMove}) {
+    if (stagedStone == null) return !afterPlayerMove;
+    
+    if (stagedStone!.id == 'joker') {
+      // Joker çıktıysa sıra diğer oyuncuya geçer
+      return !afterPlayerMove;
+    }
+    
+    bool pHasIt = playerRules.containsValue(stagedStone!.value);
+    bool oHasIt = opponentRules.containsValue(stagedStone!.value);
+    
+    if (afterPlayerMove) {
+      // Ben oynadım, yeni staged stone çıktı
+      if (pHasIt) return true;        // Benim sütunumda bu değer var → sıra bende
+      if (oHasIt) return false;       // Rakibin sütununda var → sıra rakipte
+      // Hiçbirinde yok → rakibe geç (boş sütunu yoksa bana dön)
+      if (!opponentRules.containsValue(null)) return true;
+      return false;
+    } else {
+      // Rakip oynadı
+      if (oHasIt) return false;       // Rakibin sütununda var → sıra rakipte kalır
+      if (pHasIt) return true;        // Benim sütunumda var → sıra bende
+      // Hiçbirinde yok → bana geç (boş sütunumuz yoksa rakipte kalsın)
+      if (!playerRules.containsValue(null)) return false;
+      return true;
+    }
+  }
+
+  /// Kazanan var mı kontrol et
+  void _checkForWins({required bool isAfterPlayerMove}) async {
     if (_checkWin(playerCols)) { 
       winner = p1Name; 
       await ApiService.sendResult(nickname: widget.nickname, isWin: true, type: "duel_online");
@@ -224,8 +266,6 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
       _showVictoryDialog("Kaybettin!"); 
       return; 
     }
-    
-    // Sıra mantığı Socket üzerinden sırayla değişiyor.
   }
 
   bool _checkWin(List<List<OkeyStone>> grid) {
