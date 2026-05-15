@@ -9,6 +9,7 @@ import 'screens/memory_game_screen.dart';
 import 'screens/leaderboard_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/online_duel_screen.dart';
+import 'screens/settings_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'services/audio_service.dart';
 
@@ -134,6 +135,12 @@ class _OkeyAppFlowState extends State<OkeyAppFlow> {
     }
     if (currentScreen == "profile") {
       return ProfileScreen(
+        nickname: userNickname,
+        onExit: () => changeScreen(userNickname, "login")
+      );
+    }
+    if (currentScreen == "settings") {
+      return SettingsScreen(
         nickname: userNickname,
         onExit: () => changeScreen(userNickname, "login")
       );

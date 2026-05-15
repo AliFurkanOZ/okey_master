@@ -43,6 +43,27 @@ class ApiService {
     }
   }
 
+  // 1.5 Kullanıcı Adı Güncelleme
+  static Future<Map<String, dynamic>> updateUsername(String newName) async {
+    try {
+      final response = await http.put(
+        Uri.parse("$_baseUrl/auth/username"),
+        headers: await _headers(),
+        body: jsonEncode({"username": newName}),
+      ).timeout(const Duration(seconds: 10));
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {'status': 200};
+      } else if (response.statusCode == 409) {
+        return {'status': 409};
+      } else {
+        return {'status': response.statusCode, 'error': response.body};
+      }
+    } catch (e) {
+      return {'status': 500};
+    }
+  }
+
   // 2. ESKİ DÜELLO METODU
   static Future<void> updateDuelScore(String nickname) async {
     await sendResult(nickname: nickname, isWin: true, type: "duel");

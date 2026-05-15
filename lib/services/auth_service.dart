@@ -60,6 +60,60 @@ class AuthService {
     }
   }
 
+  // Google ile Hesap Bağlama (Misafir hesabı için)
+  static Future<UserCredential> linkWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        throw Exception("Giriş iptal edildi.");
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final user = currentUser;
+      if (user != null) {
+        return await user.linkWithCredential(credential);
+      } else {
+        throw Exception("Oturum açık bir kullanıcı bulunamadı.");
+      }
+    } catch (e) {
+      throw Exception("Google ile bağlama başarısız: $e");
+    }
+  }
+
+  // E-posta ile Hesap Bağlama (Misafir hesabı için)
+  static Future<UserCredential> linkWithEmail(String email, String password) async {
+    try {
+      final credential = EmailAuthProvider.credential(email: email, password: password);
+      final user = currentUser;
+      if (user != null) {
+        return await user.linkWithCredential(credential);
+      } else {
+        throw Exception("Oturum açık bir kullanıcı bulunamadı.");
+      }
+    } catch (e) {
+      throw Exception("E-posta ile bağlama başarısız: $e");
+    }
+  }
+
+  // Şifre Değiştirme
+  static Future<void> changePassword(String newPassword) async {
+    try {
+      final user = currentUser;
+      if (user != null) {
+        await user.updatePassword(newPassword);
+      } else {
+        throw Exception("Oturum açık bir kullanıcı bulunamadı.");
+      }
+    } catch (e) {
+      throw Exception("Şifre değiştirme başarısız: $e");
+    }
+  }
+
   // Çıkış Yap
   static Future<void> signOut() async {
     await _googleSignIn.signOut();

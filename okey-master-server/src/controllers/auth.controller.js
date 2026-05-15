@@ -151,4 +151,35 @@ const migrate = async (req, res, next) => {
   }
 };
 
-module.exports = { register, getProfile, migrate, registerValidation };
+const updateUsername = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ error: 'Geçersiz veri', details: errors.array() });
+
+    const { username } = req.body;
+    const firebaseUid = req.user.uid;
+
+    const existingUser = await prisma.user.findUnique({ where: { firebaseUid } });
+    if (!existingUser) return res.status(404).json({ error: 'Kullanıcı bulunamadı' });
+
+    if (existingUser.username === username) {
+      return res.json({ success: true, username });
+    }
+
+    const nameCheck = await prisma.user.findUnique({ where: { username } });
+    if (nameCheck) {
+      return res.status(409).json({ error: 'Bu isim zaten alınmış' });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { firebaseUid },
+      data: { username }
+    });
+
+    res.json({ success: true, username: updatedUser.username });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { register, getProfile, migrate, registerValidation, updateUsername };
