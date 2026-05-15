@@ -110,7 +110,11 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       // Sunucuya Kayıt / Bilgi Çekme
-      final result = await ApiService.registerPlayer(isLogin ? "" : nick);
+      // Eğer giriş yapılıyorsa ve backend'de zaten kayıtlıysa gönderilen username önemsenmez,
+      // ancak backend doğrulamasını (min 2 karakter) geçmek için geçerli bir string gönderiyoruz.
+      String dummyNick = email.split('@')[0];
+      if (dummyNick.length < 2) dummyNick += "user";
+      final result = await ApiService.registerPlayer(isLogin ? dummyNick : nick);
       final int statusCode = result['status'] as int;
       final String? assignedUsername = result['username'] as String?;
 
@@ -498,6 +502,7 @@ class _LoginScreenState extends State<LoginScreen> {
             _lobbyButton("HAFIZA (BOT)", "memory_bot", Icons.memory),
             _lobbyButton("PROFİLİM", "profile", Icons.person_outline),
             _lobbyButton("LİDERLİK TABLOSU", "leaderboard", Icons.emoji_events),
+            _lobbyButton("AYARLAR", "settings", Icons.settings),
             const SizedBox(height: 40),
             TextButton.icon(
               icon: const Icon(Icons.logout, color: Colors.white70, size: 20),

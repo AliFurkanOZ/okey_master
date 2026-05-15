@@ -8,5 +8,6 @@ const router = express.Router();
 router.post('/register', verifyToken, authController.registerValidation, authController.register);
 router.get('/profile', verifyToken, authController.getProfile);
 router.post('/migrate', verifyToken, authController.migrate);
+router.put('/username', verifyToken, authController.registerValidation, authController.updateUsername);
 
 module.exports = router;
