@@ -239,7 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 15,
           crossAxisSpacing: 15,
-          childAspectRatio: 1.5,
+          childAspectRatio: 1.25,
           children: [
             _statCard("Toplam Oyun", stats!['totalGames']?.toString() ?? '0', Icons.casino, Colors.blueAccent),
             _statCard("Kazanma", stats!['totalWins']?.toString() ?? '0', Icons.emoji_events, Colors.greenAccent),
@@ -258,14 +258,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withOpacity(0.3))
       ),
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: color, size: 30),
-          const SizedBox(height: 8),
-          Text(value, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-          Text(title, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 4),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(value, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+          ),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(title, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
+          ),
         ],
       ),
     );

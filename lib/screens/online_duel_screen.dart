@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import '../models/okey_stone.dart';
 import '../widgets/stone_widget.dart';
 import '../services/api_service.dart';
@@ -48,7 +47,7 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
     // Kuyruğa katıl
     SocketService.joinQueue(widget.nickname, 'duel_online');
 
-    // Oyun Başladı
+    // Oyun Başladı — Sunucudan gelen gameState ile board oluştur
     SocketService.on('game_start', (data) {
       if (!mounted) return;
       setState(() {
@@ -64,15 +63,22 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
 
         // Kim başlayacak?
         isPlayerTurn = data['firstTurn'] == SocketService.socketId;
-        _initBoard();
+
+        // ============ SUNUCUDAN GELEN GAME STATE İLE BOARD OLUŞTUR ============
+        final gameState = data['gameState'];
+        _buildBoardFromServer(gameState);
       });
     });
 
-    // Rakip Hamle Yaptı
+    // Rakip Hamle Yaptı — Sunucudan gelen taş bilgisi ile güncelle
     SocketService.on('opponent_move', (data) {
       if (!mounted) return;
       int colIdx = data['colIdx'];
-      _applyOpponentMove(colIdx);
+      // Rakipten çıkan taşın bilgisi de geliyor
+      Map<String, dynamic>? exitingStoneData = data['exitingStone'] != null 
+          ? Map<String, dynamic>.from(data['exitingStone']) 
+          : null;
+      _applyOpponentMove(colIdx, exitingStoneData);
     });
 
     // Rakip Ayrıldı
@@ -96,32 +102,37 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
     super.dispose();
   }
 
-  void _initBoard() {
-    List<String> colors = ['siyah', 'mavi', 'kirmizi', 'sari'];
-    List<OkeyStone> deck = [];
-    for (var c in colors) {
-      for (int i = 1; i <= 12; i++) {
-        deck.add(OkeyStone(path: 'assets/images/${c}_$i.png', id: '${c}_${i}_${Random().nextInt(1000)}', value: i, color: c));
-      }
+  /// Sunucudan gelen gameState ile tahtayı oluştur
+  void _buildBoardFromServer(Map<String, dynamic> gameState) {
+    final playerStonesData = gameState['playerStones'] as List;
+    final opponentStonesData = gameState['opponentStones'] as List;
+    final centerStoneData = Map<String, dynamic>.from(gameState['centerStone']);
+
+    winner = null;
+    playerRules = {0: null, 1: null, 2: null, 3: null, 4: null, 5: null};
+    opponentRules = {0: null, 1: null, 2: null, 3: null, 4: null, 5: null};
+
+    // Oyuncu taşlarını yerleştir
+    for (int col = 0; col < 6; col++) {
+      final colData = (playerStonesData[col] as List);
+      playerCols[col] = colData.map((stoneJson) {
+        return OkeyStone.fromJson(Map<String, dynamic>.from(stoneJson));
+      }).toList();
     }
-    
-    // Her iki taraf için aynı deste dizilimini garanti etmek adına
-    // seed tabanlı prng kullanılabilirdi ama şimdilik client tarafında bağımsız kart çekiyoruz.
-    // Görsel amaçlı her oyuncu kendi ekranında kartları görüyor. Gerçek kurallı senaryoda deste seed'i sunucudan gelmeli.
-    final rng = Random();
-    for (int i = deck.length - 1; i > 0; i--) {
-      final j = rng.nextInt(i + 1);
-      final temp = deck[i]; deck[i] = deck[j]; deck[j] = temp;
+
+    // Rakip taşlarını yerleştir
+    for (int col = 0; col < 6; col++) {
+      final colData = (opponentStonesData[col] as List);
+      opponentCols[col] = colData.map((stoneJson) {
+        return OkeyStone.fromJson(Map<String, dynamic>.from(stoneJson));
+      }).toList();
     }
-    
-    setState(() {
-      winner = null;
-      for (int i = 0; i < 6; i++) {
-        playerCols[i] = List.generate(4, (_) => deck.removeLast()..isRevealed = false);
-        opponentCols[i] = List.generate(4, (_) => deck.removeLast()..isRevealed = false);
-      }
-      stagedStone = OkeyStone(path: 'assets/images/sahte_okey.png', id: 'joker', value: 0, color: 'joker', isRevealed: true);
-    });
+
+    // Ortadaki taş (joker ile başlar)
+    stagedStone = OkeyStone.fromJson(centerStoneData);
+
+    debugPrint('[OnlineDuel] Board sunucudan yüklendi. Ortadaki taş: ${stagedStone!.color}_${stagedStone!.value}');
+    debugPrint('[OnlineDuel] Oyuncu sütun 0 ilk taş: ${playerCols[0].isNotEmpty ? "${playerCols[0][0].color}_${playerCols[0][0].value}" : "boş"}');
   }
 
   void _handleMove(int colIdx) async {
@@ -154,20 +165,24 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
     
     AudioService.playStoneMove();
 
-    // Sunucuya hamleyi bildir
+    // Sunucuya hamleyi bildir — çıkan taşın bilgisini de gönder
     SocketService.emit('game_move', {
       'roomId': roomId,
-      'details': {'colIdx': colIdx}
+      'details': {
+        'colIdx': colIdx,
+        'exitingStone': exiting.toJson(),
+      }
     });
 
     _determineNextTurn(isAfterPlayerMove: true);
   }
 
-  void _applyOpponentMove(int colIdx) async {
+  void _applyOpponentMove(int colIdx, Map<String, dynamic>? exitingStoneData) async {
     if (isAnimating || stagedStone == null || winner != null) return;
     
     setState(() { isAnimating = true; });
-    OkeyStone exiting = opponentCols[colIdx].last;
+    
+    // Ortadaki taş rakibin sütununa giriyor
     OkeyStone entering = stagedStone!;
     
     if (opponentRules[colIdx] == null && entering.id != 'joker') opponentRules[colIdx] = entering.value;
@@ -176,11 +191,17 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
     if (!mounted) return;
     
     setState(() {
+      // Rakibin sütunundan son taşı çıkar
       opponentCols[colIdx].removeLast();
       entering.isRevealed = true;
       opponentCols[colIdx].insert(0, entering);
-      exiting.isRevealed = true;
-      stagedStone = exiting;
+      
+      // Ortaya yeni taşı koy — rakipten gelen exitingStone bilgisi
+      if (exitingStoneData != null) {
+        stagedStone = OkeyStone.fromJson(exitingStoneData);
+        stagedStone!.isRevealed = true;
+      }
+      
       isAnimating = false;
       isPlayerTurn = true; // Sıra bize geçti
     });
@@ -204,8 +225,7 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
       return; 
     }
     
-    // Joker atıldıysa veya doluluk varsa sıra mantığını buraya entegre edebilirsiniz
-    // Şu anki versiyonda Socket üzerinden sırayla değişiyor.
+    // Sıra mantığı Socket üzerinden sırayla değişiyor.
   }
 
   bool _checkWin(List<List<OkeyStone>> grid) {

@@ -13,9 +13,13 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _nickController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   String? registeredNick;
   bool isLoading = false;
   bool isGuestMode = false;
+  bool isEmailMode = false;
+  bool isLogin = true;
 
   @override
   void initState() {
@@ -81,6 +85,55 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _handleEmailAuth() async {
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
+    String nick = _nickController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      _showError("Lütfen e-posta ve şifrenizi girin.");
+      return;
+    }
+
+    if (!isLogin && nick.length < 2) {
+      _showError("Kullanıcı adı en az 2 karakter olmalıdır.");
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      if (isLogin) {
+        await AuthService.signInWithEmail(email, password);
+      } else {
+        await AuthService.registerWithEmail(email, password);
+      }
+
+      // Sunucuya Kayıt / Bilgi Çekme
+      final result = await ApiService.registerPlayer(isLogin ? "" : nick);
+      final int statusCode = result['status'] as int;
+      final String? assignedUsername = result['username'] as String?;
+
+      if (statusCode == 201 || statusCode == 200) {
+        final prefs = await SharedPreferences.getInstance();
+        final actualNick = assignedUsername ?? (isLogin ? email.split('@')[0] : nick);
+        await prefs.setString('user_nick', actualNick);
+        setState(() {
+          registeredNick = actualNick;
+          isEmailMode = false;
+        });
+      } else if (statusCode == 409) {
+        _showError("Bu kullanıcı adı zaten alınmış!");
+      } else {
+        _showError("Sunucu Hatası ($statusCode)!");
+      }
+    } catch (e) {
+      _showError("${isLogin ? 'Giriş' : 'Kayıt'} başarısız: ${e.toString().split(']').last.trim()}");
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
   Future<void> _handleGoogleLogin() async {
     setState(() => isLoading = true);
 
@@ -126,6 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       registeredNick = null;
       isGuestMode = false;
+      isEmailMode = false;
     });
   }
 
@@ -201,6 +255,8 @@ class _LoginScreenState extends State<LoginScreen> {
               )
             else if (isGuestMode)
               _buildGuestInputUI()
+            else if (isEmailMode)
+              _buildEmailAuthUI()
             else
               _buildAuthButtons(),
           ],
@@ -212,6 +268,27 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildAuthButtons() {
     return Column(
       children: [
+        // E-posta ile Giriş Butonu
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black87,
+            fixedSize: const Size(double.infinity, 50),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 2,
+          ),
+          onPressed: () => setState(() => isEmailMode = true),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.email, size: 24, color: Colors.blueAccent),
+              const SizedBox(width: 8),
+              const Text("E-posta ile Giriş Yap", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            ],
+          )
+        ),
+        const SizedBox(height: 15),
+
         // Google Giriş Butonu
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -301,6 +378,86 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ],
+        )
+      ],
+    );
+  }
+
+  Widget _buildEmailAuthUI() {
+    return Column(
+      children: [
+        Text(
+          isLogin ? "E-posta ile Giriş" : "E-posta ile Kayıt",
+          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 15),
+        if (!isLogin) ...[
+          TextField(
+            controller: _nickController,
+            style: const TextStyle(color: Colors.black87),
+            decoration: InputDecoration(
+              hintText: "Kullanıcı Adı",
+              filled: true,
+              fillColor: Colors.white.withOpacity(0.9),
+              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+            ),
+          ),
+          const SizedBox(height: 10),
+        ],
+        TextField(
+          controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
+          style: const TextStyle(color: Colors.black87),
+          decoration: InputDecoration(
+            hintText: "E-posta Adresi",
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.9),
+            contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _passwordController,
+          obscureText: true,
+          style: const TextStyle(color: Colors.black87),
+          decoration: InputDecoration(
+            hintText: "Şifre",
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.9),
+            contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white70),
+              onPressed: () => setState(() => isEmailMode = false),
+            ),
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber,
+                  foregroundColor: Colors.brown[900],
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 3,
+                ),
+                onPressed: _handleEmailAuth,
+                child: Text(isLogin ? "GİRİŞ YAP" : "KAYIT OL", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))
+              ),
+            ),
+          ],
+        ),
+        TextButton(
+          onPressed: () => setState(() => isLogin = !isLogin),
+          child: Text(
+            isLogin ? "Hesabınız yok mu? Kayıt olun" : "Zaten hesabınız var mı? Giriş yapın",
+            style: const TextStyle(color: Colors.white70),
+          ),
         )
       ],
     );
