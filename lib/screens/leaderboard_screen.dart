@@ -9,9 +9,7 @@ class LeaderboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: AppTheme.mainBackgroundGradient,
-      ),
+      decoration: AppTheme.mainBackgroundDecoration,
       child: DefaultTabController(
         length: 4,
         child: Scaffold(

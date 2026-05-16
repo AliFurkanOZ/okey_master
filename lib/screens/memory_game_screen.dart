@@ -246,7 +246,7 @@ class _OkeyMemoryGameState extends State<OkeyMemoryGame> {
         ],
       ),
       body: Container(
-        decoration: const BoxDecoration(gradient: AppTheme.mainBackgroundGradient),
+        decoration: AppTheme.mainBackgroundDecoration,
         child: gameStarted ? _buildGameGrid() : _buildDifficultySelection(),
       ),
     );
