@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
+import '../theme/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
   final Function(String, String) onSelect;
@@ -202,52 +204,44 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF8B5A2B),
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            colors: [Color(0xFFE8D0A9), Color(0xFF8B5A2B)],
-            radius: 1.3
-          )
+          gradient: AppTheme.mainBackgroundGradient,
         ),
-        child: registeredNick == null 
-            ? _buildAuthUI() 
-            : _buildLobbyUI(),
+        child: SafeArea(
+          child: registeredNick == null 
+              ? _buildAuthUI() 
+              : _buildLobbyUI(),
+        ),
       ),
     );
   }
 
   Widget _buildAuthUI() {
     return Center(
-      child: Container(
-        padding: const EdgeInsets.all(25),
-        margin: const EdgeInsets.symmetric(horizontal: 30),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.6), // Glassmorphism etkisi için
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white24, width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 15,
-              spreadRadius: 5
-            )
-          ]
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Container(
+            padding: const EdgeInsets.all(30),
+            margin: const EdgeInsets.symmetric(horizontal: 25),
+            decoration: AppTheme.glassDecoration(borderRadius: 25, glow: true),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.casino, size: 60, color: Colors.amber),
-            const SizedBox(height: 10),
+            const Icon(Icons.casino, size: 70, color: AppTheme.accentCyan),
+            const SizedBox(height: 15),
             const Text(
               "OKEY ARCADE",
               style: TextStyle(
-                color: Colors.amber, 
-                fontSize: 28, 
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5
+                color: Colors.white, 
+                fontSize: 32, 
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2.0,
+                shadows: [Shadow(color: AppTheme.accentCyan, blurRadius: 10)]
               )
             ),
             const SizedBox(height: 30),
@@ -255,7 +249,7 @@ class _LoginScreenState extends State<LoginScreen> {
             if (isLoading)
               const Padding(
                 padding: EdgeInsets.all(20.0),
-                child: CircularProgressIndicator(color: Colors.amber),
+                child: CircularProgressIndicator(color: AppTheme.accentCyan),
               )
             else if (isGuestMode)
               _buildGuestInputUI()
@@ -263,9 +257,11 @@ class _LoginScreenState extends State<LoginScreen> {
               _buildEmailAuthUI()
             else
               _buildAuthButtons(),
-          ],
+            ],
+          ),
         ),
       ),
+    ),
     );
   }
 
@@ -277,9 +273,10 @@ class _LoginScreenState extends State<LoginScreen> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             foregroundColor: Colors.black87,
-            fixedSize: const Size(double.infinity, 50),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            elevation: 2,
+            fixedSize: const Size(double.infinity, 55),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            elevation: 5,
+            shadowColor: Colors.black54,
           ),
           onPressed: () => setState(() => isEmailMode = true),
           child: Row(
@@ -298,9 +295,10 @@ class _LoginScreenState extends State<LoginScreen> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             foregroundColor: Colors.black87,
-            fixedSize: const Size(double.infinity, 50),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            elevation: 2,
+            fixedSize: const Size(double.infinity, 55),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            elevation: 5,
+            shadowColor: Colors.black54,
           ),
           onPressed: _handleGoogleLogin, 
           child: Row(
@@ -331,10 +329,10 @@ class _LoginScreenState extends State<LoginScreen> {
         // Misafir Butonu
         OutlinedButton(
           style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.amber,
-            side: const BorderSide(color: Colors.amber, width: 1.5),
-            fixedSize: const Size(double.infinity, 50),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            foregroundColor: Colors.white,
+            side: const BorderSide(color: Colors.white54, width: 1.5),
+            fixedSize: const Size(double.infinity, 55),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           ),
           onPressed: _handleGuestLogin,
           child: const Text("Misafir Olarak Devam Et", style: TextStyle(fontSize: 16)),
@@ -349,15 +347,24 @@ class _LoginScreenState extends State<LoginScreen> {
         TextField(
           controller: _nickController,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           decoration: InputDecoration(
             hintText: "Bir takma isim belirleyin",
+            hintStyle: const TextStyle(color: Colors.white54),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.9),
+            fillColor: Colors.white.withOpacity(0.1),
             contentPadding: const EdgeInsets.symmetric(vertical: 15),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: Colors.white24),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: Colors.white24),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: AppTheme.accentCyan, width: 2),
             ),
           ),
         ),
@@ -371,11 +378,12 @@ class _LoginScreenState extends State<LoginScreen> {
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber,
-                  foregroundColor: Colors.brown[900],
+                  backgroundColor: AppTheme.accentCyan,
+                  foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 3,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  elevation: 5,
+                  shadowColor: AppTheme.accentCyan.withOpacity(0.5),
                 ),
                 onPressed: _registerGuest, 
                 child: const Text("BAŞLA", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))
@@ -444,11 +452,12 @@ class _LoginScreenState extends State<LoginScreen> {
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber,
-                  foregroundColor: Colors.brown[900],
+                  backgroundColor: AppTheme.accentCyan,
+                  foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 3,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  elevation: 5,
+                  shadowColor: AppTheme.accentCyan.withOpacity(0.5),
                 ),
                 onPressed: _handleEmailAuth,
                 child: Text(isLogin ? "GİRİŞ YAP" : "KAYIT OL", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))
@@ -473,19 +482,20 @@ class _LoginScreenState extends State<LoginScreen> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: Colors.black45,
+                color: Colors.white.withOpacity(0.05),
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.amber, width: 2)
+                border: Border.all(color: AppTheme.accentCyan, width: 2),
+                boxShadow: [BoxShadow(color: AppTheme.accentCyan.withOpacity(0.3), blurRadius: 10)]
               ),
-              child: const Icon(Icons.person, size: 50, color: Colors.amber),
+              child: const Icon(Icons.person, size: 50, color: AppTheme.accentCyan),
             ),
             const SizedBox(height: 15),
-            const Text("LOBİ", style: TextStyle(color: Colors.white, fontSize: 28, letterSpacing: 2, fontWeight: FontWeight.w900)),
-            Text("Hoş geldin, $registeredNick", style: const TextStyle(color: Colors.amber, fontSize: 16, fontWeight: FontWeight.w500)),
+            const Text("LOBİ", style: TextStyle(color: Colors.white, fontSize: 32, letterSpacing: 4, fontWeight: FontWeight.w900)),
+            Text("Hoş geldin, $registeredNick", style: const TextStyle(color: AppTheme.accentAmber, fontSize: 18, fontWeight: FontWeight.w500)),
             
             if (AuthService.currentUser?.isAnonymous == true)
               Padding(
@@ -493,17 +503,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Text("Misafir Hesap", style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
               ),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
             _lobbyButton("DÜELLO (LOKAL)", "duel_2p", Icons.people),
-            _lobbyButton("DÜELLO (ONLİNE)", "duel_online", Icons.public),
+            _lobbyButton("DÜELLO (ONLİNE)", "duel_online", Icons.public, isPrimary: true),
             _lobbyButton("HAFIZA (LOKAL)", "memory_2p", Icons.psychology),
             const Divider(color: Colors.white24, indent: 50, endIndent: 50, height: 40),
             _lobbyButton("DÜELLO (BOT)", "duel_bot", Icons.smart_toy),
             _lobbyButton("HAFIZA (BOT)", "memory_bot", Icons.memory),
+            const Divider(color: Colors.white24, indent: 50, endIndent: 50, height: 40),
             _lobbyButton("PROFİLİM", "profile", Icons.person_outline),
             _lobbyButton("LİDERLİK TABLOSU", "leaderboard", Icons.emoji_events),
             _lobbyButton("AYARLAR", "settings", Icons.settings),
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
             TextButton.icon(
               icon: const Icon(Icons.logout, color: Colors.white70, size: 20),
               label: const Text("Çıkış Yap", style: TextStyle(color: Colors.white70, fontSize: 16)),
@@ -516,25 +527,34 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _lobbyButton(String title, String route, IconData icon) {
+  Widget _lobbyButton(String title, String route, IconData icon, {bool isPrimary = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 30),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white.withOpacity(0.95),
-          foregroundColor: Colors.brown[800],
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          elevation: 5,
-        ),
-        onPressed: () => widget.onSelect(registeredNick!, route),
-        child: Row(
-          children: [
-            Icon(icon, size: 24, color: Colors.brown[700]),
-            const SizedBox(width: 15),
-            Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
-            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black26),
-          ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isPrimary ? AppTheme.accentCyan.withOpacity(0.2) : Colors.white.withOpacity(0.05),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                side: BorderSide(color: isPrimary ? AppTheme.accentCyan : Colors.white24, width: 1)
+              ),
+              elevation: 0,
+            ),
+            onPressed: () => widget.onSelect(registeredNick!, route),
+            child: Row(
+              children: [
+                Icon(icon, size: 24, color: isPrimary ? AppTheme.accentCyan : Colors.white70),
+                const SizedBox(width: 15),
+                Expanded(child: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isPrimary ? AppTheme.accentCyan : Colors.white, letterSpacing: 1.2))),
+                Icon(Icons.arrow_forward_ios, size: 16, color: isPrimary ? AppTheme.accentCyan : Colors.white24),
+              ],
+            ),
+          ),
         ),
       ),
     );

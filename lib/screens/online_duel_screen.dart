@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../services/socket_service.dart';
 import '../services/audio_service.dart';
 import 'package:confetti/confetti.dart';
+import '../theme/app_theme.dart';
 
 class OnlineDuelScreen extends StatefulWidget {
   final String nickname;
@@ -297,16 +298,16 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent, 
         elevation: 0, 
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: widget.onExit),
-        title: Text(isWaiting ? "Eşleştiriliyor..." : "Online Düello", style: const TextStyle(color: Colors.amber)),
+        leading: IconButton(icon: const Icon(Icons.arrow_back, color: AppTheme.accentCyan), onPressed: widget.onExit),
+        title: Text(isWaiting ? "Eşleştiriliyor..." : "Online Düello", style: const TextStyle(color: AppTheme.accentCyan)),
         centerTitle: true,
       ),
       body: Container(
-        decoration: const BoxDecoration(gradient: RadialGradient(colors: [Color(0xFFE8D0A9), Color(0xFF8B5A2B)], radius: 1.3)),
+        decoration: const BoxDecoration(gradient: AppTheme.mainBackgroundGradient),
         child: Stack(
           children: [
             isWaiting ? _buildWaitingUI() : _buildGameUI(),
