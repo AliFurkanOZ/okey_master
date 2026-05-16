@@ -311,9 +311,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: AppTheme.mainBackgroundGradient,
-        ),
+        decoration: AppTheme.mainBackgroundDecoration,
         child: SafeArea(
           child: isLoading 
               ? const Center(child: CircularProgressIndicator(color: AppTheme.accentCyan))

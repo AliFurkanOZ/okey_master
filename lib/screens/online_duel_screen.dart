@@ -307,7 +307,7 @@ class _OnlineDuelScreenState extends State<OnlineDuelScreen> {
         centerTitle: true,
       ),
       body: Container(
-        decoration: const BoxDecoration(gradient: AppTheme.mainBackgroundGradient),
+        decoration: AppTheme.mainBackgroundDecoration,
         child: Stack(
           children: [
             isWaiting ? _buildWaitingUI() : _buildGameUI(),

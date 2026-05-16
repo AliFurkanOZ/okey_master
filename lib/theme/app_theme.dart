@@ -4,17 +4,20 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // ANA RENKLER
-  static const Color backgroundDark = Color(0xFF0d0f1a);
-  static const Color backgroundLight = Color(0xFF1a1a2e);
-  static const Color accentCyan = Color(0xFF00f2fe);
-  static const Color accentAmber = Colors.amber;
-  static const Color accentMagenta = Color(0xFFfe006e);
+  static const Color backgroundDark = Color(0xFF0A0F1D); // Çok koyu lacivert
+  static const Color backgroundLight = Color(0xFF121B2F); // Petrol/Gece mavisi
+  static const Color accentCyan = Color(0xFF2DD4BF); // Rafine Teal/Cyan vurgu (neon olmayan)
+  static const Color accentAmber = Color(0xFFFBBF24); // Yumuşak altın sarısı
+  static const Color accentMagenta = Color(0xFFE879F9); // Yumuşak pembe
 
-  // ARKA PLAN GRADYANI (Tüm ekranlar için)
-  static const RadialGradient mainBackgroundGradient = RadialGradient(
-    colors: [backgroundLight, backgroundDark],
-    radius: 1.5,
-    center: Alignment.topLeft,
+  // YENİ ARKA PLAN (Premium Görsel)
+  static const BoxDecoration mainBackgroundDecoration = BoxDecoration(
+    color: backgroundDark,
+    image: DecorationImage(
+      image: AssetImage('assets/images/premium_bg.png'),
+      fit: BoxFit.cover,
+      colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken), // Hafif karartma
+    ),
   );
 
   // GLASSMORPHISM KART DEKORASYONU
@@ -24,23 +27,23 @@ class AppTheme {
     Color glowColor = accentCyan,
   }) {
     return BoxDecoration(
-      color: Colors.white.withOpacity(0.05),
+      color: const Color(0xFF1E293B).withValues(alpha: 0.25), // Çok hafif saydam grafit
       borderRadius: BorderRadius.circular(borderRadius),
       border: Border.all(
-        color: Colors.white.withOpacity(0.1),
-        width: 1,
+        color: Colors.white.withValues(alpha: 0.1),
+        width: 0.5, // Daha ince ve zarif bir sınır
       ),
       boxShadow: glow ? [
         BoxShadow(
-          color: glowColor.withOpacity(0.3),
+          color: glowColor.withValues(alpha: 0.15), // Parıltı daha yumuşak
           blurRadius: 15,
-          spreadRadius: 2,
+          spreadRadius: 1,
         )
       ] : [
         BoxShadow(
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withValues(alpha: 0.25),
           blurRadius: 10,
-          spreadRadius: 2,
+          spreadRadius: 1, // Daha yumuşak gölge
         )
       ],
     );
@@ -55,11 +58,15 @@ class AppTheme {
         primary: accentCyan,
         secondary: accentAmber,
       ),
-      scaffoldBackgroundColor: Colors.transparent, // Gradyan arka planlar için transparent
+      scaffoldBackgroundColor: Colors.transparent, // Arka plan dekorasyonu için transparent
       useMaterial3: true,
-      textTheme: GoogleFonts.outfitTextTheme().apply(
+      textTheme: GoogleFonts.interTextTheme().apply( // Inter, temiz ve geometrik bir font
         bodyColor: Colors.white,
         displayColor: accentCyan,
+      ).copyWith(
+        titleLarge: GoogleFonts.inter(fontWeight: FontWeight.w800, letterSpacing: -0.5),
+        titleMedium: GoogleFonts.inter(fontWeight: FontWeight.w600, letterSpacing: -0.3),
+        bodyLarge: GoogleFonts.inter(letterSpacing: -0.2),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -68,32 +75,32 @@ class AppTheme {
         iconTheme: IconThemeData(color: accentCyan),
         titleTextStyle: TextStyle(
           color: accentCyan,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 2.0,
-          fontSize: 20,
+          fontWeight: FontWeight.w700, // Biraz daha rafine, çok aşırı kalın değil
+          letterSpacing: 0.5, // Daraltılmış harf aralığı
+          fontSize: 18, // Biraz daha minimal boyut
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: accentCyan,
+          backgroundColor: accentCyan.withValues(alpha: 0.9), // Tam fosforlu olmaması için hafif saydamlık/yoğunluk
           foregroundColor: backgroundDark,
-          elevation: 5,
+          elevation: 2, // Daha düşük gölge seviyesi
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(12), // Çok yuvarlak değil, daha rafine
           ),
-          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: -0.3),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: accentCyan,
-          side: const BorderSide(color: accentCyan, width: 1.5),
+          side: const BorderSide(color: accentCyan, width: 1.0), // Daha ince çerçeve
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: -0.3),
         ),
       ),
     );

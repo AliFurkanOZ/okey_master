@@ -207,9 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: AppTheme.mainBackgroundGradient,
-        ),
+        decoration: AppTheme.mainBackgroundDecoration,
         child: SafeArea(
           child: registeredNick == null 
               ? _buildAuthUI() 

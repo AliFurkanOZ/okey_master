@@ -199,7 +199,7 @@ class _DuelGameScreenState extends State<DuelGameScreen> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: widget.onExit)),
       body: Container(
-        decoration: const BoxDecoration(gradient: AppTheme.mainBackgroundGradient),
+        decoration: AppTheme.mainBackgroundDecoration,
         child: Stack(
           children: [
             Column(children: [
