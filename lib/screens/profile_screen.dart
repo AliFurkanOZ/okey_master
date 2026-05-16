@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import '../services/api_service.dart';
+import '../theme/app_theme.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String nickname;
@@ -51,14 +53,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent, 
         elevation: 0,
-        title: const Text("OYUNCU PROFİLİ", style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        title: const Text("OYUNCU PROFİLİ", style: TextStyle(color: AppTheme.accentCyan, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.amber), 
+          icon: const Icon(Icons.arrow_back, color: AppTheme.accentCyan), 
           onPressed: widget.onExit
         ),
       ),
@@ -66,14 +69,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            colors: [Color(0xFFE8D0A9), Color(0xFF8B5A2B)],
-            radius: 1.5,
-          )
+          gradient: AppTheme.mainBackgroundGradient,
         ),
-        child: isLoading 
-            ? const Center(child: CircularProgressIndicator(color: Colors.amber))
-            : _buildProfileContent(),
+        child: SafeArea(
+          child: isLoading 
+              ? const Center(child: CircularProgressIndicator(color: AppTheme.accentCyan))
+              : _buildProfileContent(),
+        ),
       ),
     );
   }
@@ -113,30 +115,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
     double progress = nextRankScore > 0 ? (currentScore / nextRankScore) : 1.0;
     if(progress > 1.0) progress = 1.0;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: _getRankColor(rank).withOpacity(0.5), width: 2),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 10, spreadRadius: 2)
-        ]
-      ),
-      child: Column(
-        children: [
-          Row(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(25),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: AppTheme.glassDecoration(borderRadius: 25, glow: true, glowColor: _getRankColor(rank)),
+          child: Column(
             children: [
-              // Avatar
-              Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black45,
-                  border: Border.all(color: _getRankColor(rank), width: 3),
-                ),
-                child: const Icon(Icons.person, size: 50, color: Colors.white),
-              ),
+              Row(
+                children: [
+                  // Avatar
+                  Container(
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.05),
+                      border: Border.all(color: _getRankColor(rank), width: 3),
+                      boxShadow: [BoxShadow(color: _getRankColor(rank).withOpacity(0.5), blurRadius: 10)]
+                    ),
+                    child: const Icon(Icons.person, size: 50, color: Colors.white),
+                  ),
               const SizedBox(width: 20),
               // İsim ve Unvan
               Expanded(
@@ -173,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Rütbe İlerlemesi", style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
-                  Text("$currentScore / $nextRankScore Puan", style: const TextStyle(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text("$currentScore / $nextRankScore Puan", style: TextStyle(color: _getRankColor(rank), fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),
               const SizedBox(height: 8),
@@ -181,14 +181,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 borderRadius: BorderRadius.circular(10),
                 child: LinearProgressIndicator(
                   value: progress,
-                  minHeight: 10,
-                  backgroundColor: Colors.white24,
+                  minHeight: 12,
+                  backgroundColor: Colors.white12,
                   valueColor: AlwaysStoppedAnimation<Color>(_getRankColor(rank)),
                 ),
               )
             ],
           )
         ],
+      ),
+        ),
       ),
     );
   }
@@ -252,27 +254,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _statCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3))
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 4),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(value, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          decoration: AppTheme.glassDecoration(borderRadius: 20),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: 28),
+              const SizedBox(height: 4),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(value, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+              ),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(title, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
+              ),
+            ],
           ),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(title, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12)),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -285,33 +289,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: EdgeInsets.only(left: 10, bottom: 10),
           child: Text("BAŞARIMLAR KÖŞESİ", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1)),
         ),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.6),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white24)
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: AppTheme.glassDecoration(borderRadius: 20),
+              child: achievements.isEmpty
+                  ? Column(
+                      children: [
+                        const Icon(Icons.lock_outline, size: 40, color: Colors.white30),
+                        const SizedBox(height: 10),
+                        const Text("Henüz açılmış başarım yok.", style: TextStyle(color: Colors.white54)),
+                        const SizedBox(height: 5),
+                        Text("Oynadıkça gizli başarımları keşfet!", style: TextStyle(color: AppTheme.accentAmber, fontSize: 12)),
+                      ],
+                    )
+                  : Wrap(
+                      spacing: 15,
+                      runSpacing: 15,
+                      alignment: WrapAlignment.center,
+                      children: achievements.map((a) {
+                        final ach = a['achievement'];
+                        return _achievementBadge(ach['name'] ?? 'Rozet', ach['iconUrl'] ?? '🏆');
+                      }).toList(),
+                    ),
+            ),
           ),
-          child: achievements.isEmpty
-              ? Column(
-                  children: [
-                    const Icon(Icons.lock_outline, size: 40, color: Colors.white30),
-                    const SizedBox(height: 10),
-                    const Text("Henüz açılmış başarım yok.", style: TextStyle(color: Colors.white54)),
-                    const SizedBox(height: 5),
-                    Text("Oynadıkça gizli başarımları keşfet!", style: TextStyle(color: Colors.amber.withOpacity(0.8), fontSize: 12)),
-                  ],
-                )
-              : Wrap(
-                  spacing: 15,
-                  runSpacing: 15,
-                  alignment: WrapAlignment.center,
-                  children: achievements.map((a) {
-                    final ach = a['achievement'];
-                    return _achievementBadge(ach['name'] ?? 'Rozet', ach['iconUrl'] ?? '🏆');
-                  }).toList(),
-                ),
         )
       ],
     );
@@ -323,7 +329,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.amber.withOpacity(0.3))
+        border: Border.all(color: AppTheme.accentCyan.withOpacity(0.3))
       ),
       padding: const EdgeInsets.all(10),
       child: Column(
@@ -349,7 +355,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case 'gold': return const Color(0xFFFFD700);
       case 'diamond': return const Color(0xFF00FFFF);
       case 'master': return const Color(0xFF9370DB);
-      default: return Colors.amber;
+      default: return AppTheme.accentCyan;
     }
   }
 

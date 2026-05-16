@@ -5,6 +5,7 @@ import '../models/okey_stone.dart';
 import '../widgets/stone_widget.dart';
 import '../services/api_service.dart';
 import '../services/sync_queue_service.dart';
+import '../theme/app_theme.dart';
 enum BotDifficulty { easy, medium, hard }
 
 class OkeyMemoryGame extends StatefulWidget {
@@ -228,23 +229,26 @@ class _OkeyMemoryGameState extends State<OkeyMemoryGame> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text("Hafıza Oyunu"),
+        title: const Text("Hafıza Oyunu", style: TextStyle(color: AppTheme.accentCyan)),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: widget.onExit),
+        leading: IconButton(icon: const Icon(Icons.arrow_back, color: AppTheme.accentCyan), onPressed: widget.onExit),
         actions: [
           if (gameStarted)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               margin: const EdgeInsets.only(right: 10),
-              decoration: BoxDecoration(color: Colors.amber.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
-              child: Center(child: Text("${_stopwatch.elapsed.inSeconds} sn", style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 18))),
+              decoration: BoxDecoration(color: AppTheme.accentCyan.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
+              child: Center(child: Text("${_stopwatch.elapsed.inSeconds} sn", style: const TextStyle(color: AppTheme.accentCyan, fontWeight: FontWeight.bold, fontSize: 18))),
             ),
         ],
       ),
-      body: gameStarted ? _buildGameGrid() : _buildDifficultySelection(),
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppTheme.mainBackgroundGradient),
+        child: gameStarted ? _buildGameGrid() : _buildDifficultySelection(),
+      ),
     );
   }
 

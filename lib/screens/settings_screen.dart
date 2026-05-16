@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
 import '../services/audio_service.dart';
+import '../theme/app_theme.dart';
 
 class SettingsScreen extends StatefulWidget {
   final String nickname;
@@ -294,14 +296,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final isGuest = user?.isAnonymous ?? false;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent, 
         elevation: 0,
-        title: const Text("AYARLAR", style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        title: const Text("AYARLAR", style: TextStyle(color: AppTheme.accentCyan, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.amber), 
+          icon: const Icon(Icons.arrow_back, color: AppTheme.accentCyan), 
           onPressed: widget.onExit
         ),
       ),
@@ -309,14 +312,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            colors: [Color(0xFFE8D0A9), Color(0xFF8B5A2B)],
-            radius: 1.5,
-          )
+          gradient: AppTheme.mainBackgroundGradient,
         ),
-        child: isLoading 
-            ? const Center(child: CircularProgressIndicator(color: Colors.amber))
-            : SingleChildScrollView(
+        child: SafeArea(
+          child: isLoading 
+              ? const Center(child: CircularProgressIndicator(color: AppTheme.accentCyan))
+              : SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Column(
@@ -346,6 +347,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               ),
+        ),
       ),
     );
   }
@@ -363,26 +365,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildAccountCard(User? user, bool isGuest) {
     bool hasPasswordProvider = user?.providerData.any((p) => p.providerId == 'password') ?? false;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white24, width: 1),
-      ),
-      child: Column(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: AppTheme.glassDecoration(borderRadius: 20),
+          child: Column(
         children: [
           Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isGuest ? Colors.grey[700] : Colors.amber.withOpacity(0.2),
+                  color: isGuest ? Colors.grey[700] : AppTheme.accentCyan.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   isGuest ? Icons.person_outline : Icons.verified_user, 
-                  color: isGuest ? Colors.white70 : Colors.amber, 
+                  color: isGuest ? Colors.white70 : AppTheme.accentCyan, 
                   size: 30
                 ),
               ),
@@ -442,6 +444,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ],
+      ),
+        ),
       ),
     );
   }
@@ -512,44 +516,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildAudioSettings() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white24, width: 1),
-      ),
-      child: Column(
-        children: [
-          SwitchListTile(
-            title: const Text("Arka Plan Müziği", style: TextStyle(color: Colors.white)),
-            subtitle: const Text("Oyundaki genel müzik", style: TextStyle(color: Colors.white54, fontSize: 12)),
-            activeColor: Colors.amber,
-            value: isMusicOn,
-            onChanged: _toggleMusic,
-            secondary: Icon(isMusicOn ? Icons.music_note : Icons.music_off, color: isMusicOn ? Colors.amber : Colors.white54),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          decoration: AppTheme.glassDecoration(borderRadius: 20),
+          child: Column(
+            children: [
+              SwitchListTile(
+                title: const Text("Arka Plan Müziği", style: TextStyle(color: Colors.white)),
+                subtitle: const Text("Oyundaki genel müzik", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                activeColor: AppTheme.accentCyan,
+                value: isMusicOn,
+                onChanged: _toggleMusic,
+                secondary: Icon(isMusicOn ? Icons.music_note : Icons.music_off, color: isMusicOn ? AppTheme.accentCyan : Colors.white54),
+              ),
+              const Divider(color: Colors.white24, height: 1),
+              SwitchListTile(
+                title: const Text("Ses Efektleri", style: TextStyle(color: Colors.white)),
+                subtitle: const Text("Taş hareketleri ve buton sesleri", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                activeColor: AppTheme.accentCyan,
+                value: isSfxOn,
+                onChanged: _toggleSfx,
+                secondary: Icon(isSfxOn ? Icons.volume_up : Icons.volume_off, color: isSfxOn ? AppTheme.accentCyan : Colors.white54),
+              ),
+            ],
           ),
-          const Divider(color: Colors.white24, height: 1),
-          SwitchListTile(
-            title: const Text("Ses Efektleri", style: TextStyle(color: Colors.white)),
-            subtitle: const Text("Taş hareketleri ve buton sesleri", style: TextStyle(color: Colors.white54, fontSize: 12)),
-            activeColor: Colors.amber,
-            value: isSfxOn,
-            onChanged: _toggleSfx,
-            secondary: Icon(isSfxOn ? Icons.volume_up : Icons.volume_off, color: isSfxOn ? Colors.amber : Colors.white54),
-          ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildAboutSettings() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white24, width: 1),
-      ),
-      child: Column(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          decoration: AppTheme.glassDecoration(borderRadius: 20),
+          child: Column(
         children: [
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined, color: Colors.white54),
@@ -569,20 +575,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  backgroundColor: const Color(0xFF1E1E1E),
-                  title: const Text("Okey Arcade", style: TextStyle(color: Colors.amber)),
+                  backgroundColor: AppTheme.backgroundDark,
+                  title: const Text("Okey Arcade", style: TextStyle(color: AppTheme.accentCyan)),
                   content: const Text(
                     "Okey Arcade, arkadaşlarınızla veya botlara karşı oynayabileceğiniz modern ve dinamik bir okey oyunudur.\n\nSürüm: 1.0.0", 
                     style: TextStyle(color: Colors.white)
                   ),
                   actions: [
-                    TextButton(onPressed: () => Navigator.pop(context), child: const Text("Tamam", style: TextStyle(color: Colors.amber)))
+                    TextButton(onPressed: () => Navigator.pop(context), child: const Text("Tamam", style: TextStyle(color: AppTheme.accentCyan)))
                   ],
                 )
               );
             },
           ),
         ],
+      ),
+        ),
       ),
     );
   }

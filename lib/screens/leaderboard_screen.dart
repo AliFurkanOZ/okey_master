@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../theme/app_theme.dart';
 
 class LeaderboardScreen extends StatelessWidget {
   final VoidCallback onExit;
@@ -7,25 +8,33 @@ class LeaderboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("LİDERLİK TABLOLARI"),
-          leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: onExit),
-          bottom: const TabBar(
-            isScrollable: true,
-            tabs: [
-              Tab(text: "DÜELLO"),
-              Tab(text: "HAFIZA (KOLAY)"),
-              Tab(text: "HAFIZA (ORTA)"),
-              Tab(text: "HAFIZA (ZOR)"),
-            ],
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: AppTheme.mainBackgroundGradient,
+      ),
+      child: DefaultTabController(
+        length: 4,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text("LİDERLİK TABLOLARI", style: TextStyle(color: AppTheme.accentCyan, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+            leading: IconButton(icon: const Icon(Icons.arrow_back, color: AppTheme.accentCyan), onPressed: onExit),
+            bottom: const TabBar(
+              isScrollable: true,
+              indicatorColor: AppTheme.accentCyan,
+              labelColor: AppTheme.accentCyan,
+              unselectedLabelColor: Colors.white54,
+              tabs: [
+                Tab(text: "DÜELLO"),
+                Tab(text: "HAFIZA (KOLAY)"),
+                Tab(text: "HAFIZA (ORTA)"),
+                Tab(text: "HAFIZA (ZOR)"),
+              ],
+            ),
           ),
-        ),
-        body: Container(
-          decoration: const BoxDecoration(color: Color(0xFF1E1E1E)),
-          child: const TabBarView(
+          body: const TabBarView(
             children: [
               _RankList(category: "duel"),
               _RankList(category: "memory_easy"),
@@ -109,12 +118,24 @@ class _RankListState extends State<_RankList> {
               final entry = list[index];
               final double score = (entry['score'] ?? 0).toDouble();
               
-              return ListTile(
-                leading: CircleAvatar(child: Text("${index + 1}")),
-                title: Text(entry['nickname'] ?? "İsimsiz", style: const TextStyle(color: Colors.white)),
-                trailing: Text(
-                  widget.category == "duel" ? "$score Puan" : "${(score).toStringAsFixed(1)} sn",
-                  style: const TextStyle(color: Colors.amber),
+              Color rankColor = Colors.white54;
+              if (index == 0) rankColor = const Color(0xFFFFD700); // Gold
+              else if (index == 1) rankColor = const Color(0xFFC0C0C0); // Silver
+              else if (index == 2) rankColor = const Color(0xFFCD7F32); // Bronze
+              
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                decoration: AppTheme.glassDecoration(borderRadius: 15, glow: index < 3, glowColor: rankColor),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: rankColor.withOpacity(0.2),
+                    child: Text("${index + 1}", style: TextStyle(color: rankColor, fontWeight: FontWeight.bold)),
+                  ),
+                  title: Text(entry['nickname'] ?? "İsimsiz", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  trailing: Text(
+                    widget.category == "duel" ? "$score Puan" : "${(score).toStringAsFixed(1)} sn",
+                    style: const TextStyle(color: AppTheme.accentAmber, fontWeight: FontWeight.w900),
+                  ),
                 ),
               );
             },

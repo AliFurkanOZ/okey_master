@@ -12,6 +12,7 @@ import 'screens/online_duel_screen.dart';
 import 'screens/settings_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'services/audio_service.dart';
+import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,18 +47,7 @@ class OkeyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Okey Arcade',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.amber,
-          brightness: Brightness.dark,
-        ),
-        scaffoldBackgroundColor: const Color(0xFF1E1E1E),
-        useMaterial3: true,
-        textTheme: GoogleFonts.outfitTextTheme(Theme.of(context).textTheme).apply(
-          bodyColor: Colors.white,
-          displayColor: Colors.amber,
-        ),
-      ),
+      theme: AppTheme.darkTheme,
       home: const OkeyAppFlow(),
     );
   }
