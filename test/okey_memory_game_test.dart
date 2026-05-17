@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-// Projenizdeki yollara göre güncelleyin
 import 'package:okey_master/screens/memory_game_screen.dart';
 
 void setupMocks() {
@@ -85,7 +83,7 @@ void main() {
       // "KOLAY" butonunu bul ve tıkla
       await tester.tap(find.text('KOLAY'));
       
-      // ÇÖZÜM: setState tetiklendi, ekranın yenilenmesi için 1 kez pump yapıyoruz.
+      // setState tetiklendi, ekranın yenilenmesi için 1 kez pump yapıyoruz.
       // pumpAndSettle KULLANMIYORUZ çünkü Timer var!
       await tester.pump();
 

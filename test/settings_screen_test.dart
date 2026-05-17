@@ -5,7 +5,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
 import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-
 import 'package:okey_master/screens/settings_screen.dart';
 
 class MockFirebasePlatform extends FirebasePlatform {

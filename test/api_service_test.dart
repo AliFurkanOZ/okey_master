@@ -6,7 +6,6 @@ import 'package:firebase_core_platform_interface/firebase_core_platform_interfac
 import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:flutter/services.dart';
-
 import 'package:okey_master/services/api_service.dart';
 import 'package:okey_master/utils/constants.dart';
 
@@ -87,7 +86,6 @@ void main() {
     final baseUrl = AppConstants.apiBaseUrl;
 
     test('registerPlayer başarılı olduğunda (200) kullanıcı adını dönmeli', () async {
-      // ÇÖZÜM: 'any' yerine 'anything' kullandık. Artık hata vermeyecek.
       nock(baseUrl).post('/auth/register', anything).reply(200, jsonEncode({'username': 'oyuncu1'}));
 
       final result = await ApiService.registerPlayer('oyuncu1');

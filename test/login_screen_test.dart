@@ -6,8 +6,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
 import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-
-// Projenizdeki yollara göre güncelleyin
 import 'package:okey_master/screens/login_screen.dart';
 
 // --- FIREBASE VE AUTH MOCK ALTYAPISI ---
@@ -38,7 +36,6 @@ class MockFirebaseAuthPlatform extends Fake with MockPlatformInterfaceMixin impl
   @override
   UserPlatform? get currentUser => isLoggedIn ? MockUserPlatform() : null;
 
-  // ÇÖZÜM BURADA: Ekranın initState'inde çağrılan signOut metodunu sahtesine ekledik.
   @override
   Future<void> signOut() async {
     isLoggedIn = false;

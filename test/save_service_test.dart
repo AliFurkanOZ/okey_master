@@ -1,14 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-// Projenizdeki save_service.dart dosyasının doğru yolunu buraya yazın
 import 'package:okey_master/services/save_service.dart';
 
 void main() {
   late SaveService saveService;
 
   setUp(() async {
-    // ÇÖZÜM BURADA: SharedPreferences'ın test ortamında hata vermemesi ve 
+    // SharedPreferences'ın test ortamında hata vermemesi ve 
     // her testten önce hafızanın tertemiz (boş) olması için sahte verileri ayarlıyoruz.
     SharedPreferences.setMockInitialValues({});
 

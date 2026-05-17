@@ -6,8 +6,6 @@ import 'package:firebase_auth_platform_interface/firebase_auth_platform_interfac
 import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:flutter/services.dart';
-
-// Projenizdeki auth_service.dart dosyasının doğru yolunu buraya yazın
 import 'package:okey_master/services/auth_service.dart';
 
 // --- 1. FIREBASE CORE MOCK ---
@@ -49,7 +47,6 @@ class MockUserCredentialPlatform extends Fake with MockPlatformInterfaceMixin im
   @override
   UserPlatform? get user => MockUserPlatform();
 
-  // ÇÖZÜM 1: Tip hatasını engellemek için tipi sildik. Dart bunu otomatik algılayacak.
   @override
   get additionalUserInfo => null;
 }

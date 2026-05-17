@@ -6,8 +6,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
 import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-
-// Projenizdeki yollara göre güncelleyin
 import 'package:okey_master/screens/leaderboard_screen.dart';
 import 'package:okey_master/utils/constants.dart';
 
@@ -104,8 +102,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('KralOyuncu'), findsWidgets); 
-      // ÇÖZÜM: Dart'ta toDouble() kullanıldığı için 2500 sayısı 2500.0 olarak string'e çevrilir.
+      expect(find.text('KralOyuncu'), findsWidgets);
       expect(find.text('2500.0 Puan'), findsWidgets); 
       expect(find.text('UstaBot'), findsWidgets);
     });
