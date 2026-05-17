@@ -1,6 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-
-// Projenizdeki socket_service.dart dosyasının doğru yolunu buraya yazın
 import 'package:okey_master/services/socket_service.dart';
 
 void main() {

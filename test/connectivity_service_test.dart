@@ -3,8 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:connectivity_plus_platform_interface/connectivity_plus_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-
-// Kendi projendeki doğru yolu buraya yazmalısın
 import 'package:okey_master/services/connectivity_service.dart';
 
 /// 1. Connectivity (İnternet) Sahtelemesi

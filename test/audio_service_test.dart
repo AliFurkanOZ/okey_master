@@ -1,14 +1,11 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:audioplayers/audioplayers.dart';
-
-// BU SATIRI EKLEMELİSİN: AudioService sınıfını test dosyasına tanıtıyoruz.
 import 'package:okey_master/services/audio_service.dart'; 
 
 /// AudioPlayers kütüphanesinin test ortamında Native (Cihaz) kanallarını 
 /// arayıp uygulamanın çökmesini (MissingPluginException) engellemek için mockluyoruz.
 void setupAudioPlayerMocks() {
-// ... kodun geri kalanı aynı şekilde devam edecek ...
   TestWidgetsFlutterBinding.ensureInitialized();
 
   // Native tarafa giden tüm istekleri sessizce "başarılı" (1) dönecek şekilde yakalıyoruz.

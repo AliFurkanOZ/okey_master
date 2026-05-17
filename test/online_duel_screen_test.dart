@@ -1,17 +1,15 @@
-import 'dart:io'; // ÇÖZÜM İÇİN EKLENDİ
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-// Projenizdeki yollara göre güncelleyin
 import 'package:okey_master/screens/online_duel_screen.dart';
 import 'package:okey_master/services/socket_service.dart'; // SocketService'i kapatmak için eklendi
 
 void setupMocks() {
   TestWidgetsFlutterBinding.ensureInitialized();
   
-  // ÇÖZÜM BURADA: WebSocket/HTTP isteklerinin test ortamında "UnsupportedError" 
+  // WebSocket/HTTP isteklerinin test ortamında "UnsupportedError" 
   // fırlatıp çökmesini engellemek için Flutter'ın HTTP engelleyicisini kaldırıyoruz.
   HttpOverrides.global = null;
 

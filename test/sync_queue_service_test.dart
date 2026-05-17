@@ -7,8 +7,6 @@ import 'package:firebase_core_platform_interface/firebase_core_platform_interfac
 import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:flutter/services.dart';
-
-// Projenizdeki kendi yollarınızı buraya ekleyin
 import 'package:okey_master/services/sync_queue_service.dart';
 import 'package:okey_master/services/save_service.dart';
 import 'package:okey_master/utils/constants.dart';
