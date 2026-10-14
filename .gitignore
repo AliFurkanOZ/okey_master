@@ -1,68 +1,177 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
+# =====================================================================
+# 1. ORTAM DEĞİŞKENLERİ & HASSAS GÜVENLİK DOSYALARI (ÇOK ÖNEMLİ)
+# =====================================================================
+*.env
+*.env.*
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+.env
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
 
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
+# Özel Anahtarlar, Sertifikalar ve Kimlik Bilgileri
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.p8
+*service-account*.json
+*firebase-adminsdk*.json
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# =====================================================================
+# 2. FLUTTER / DART
+# =====================================================================
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
-/build/
-/coverage/
+doc/api/
+coverage/
 
-# Symbolication related
+# Sembol & Haritalama Dosyaları
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-
-
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
+# =====================================================================
+# 3. DERLEME / BUILD ÇIKTILARI (TÜM DİZİNLER İÇİN)
+# =====================================================================
+build/
+**/build/
 .build/
-.history
+.buildlog/
+migrate_working_dir/
 
-# IntelliJ / Android Studio
+# =====================================================================
+# 4. ANDROID
+# =====================================================================
+**/android/.gradle/
+**/android/local.properties
+**/android/**/key.properties
+**/android/app/key.properties
+**/android/captures/
+**/.externalNativeBuild/
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+
+# İmzalama Anahtarları (Keystore / JKS)
+*.keystore
+*.jks
+
+# =====================================================================
+# 5. IOS & MACOS
+# =====================================================================
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/.last_build_id
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/Pods/
+**/ios/.symlinks/
+
+**/macos/Flutter/ephemeral/
+**/macos/Flutter/Generated.xcconfig
+**/macos/Flutter/flutter_export_environment.sh
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+**/macos/Pods/
+
+# Xcode Kullanıcı Ayarları & Geçici Dosyalar
+**/xcuserdata/
+**/*.xcworkspace/xcuserdata/
+**/*.xcodeproj/xcuserdata/
+**/*.xcscmblueprint
+**/DerivedData/
+*.moved-aside
+*.pbxuser
+*.perspectivev3
+
+# =====================================================================
+# 6. WINDOWS & LINUX MASAÜSTÜ
+# =====================================================================
+**/windows/flutter/ephemeral/
+**/windows/flutter/generated_plugin_registrant.cc
+**/windows/flutter/generated_plugin_registrant.h
+**/windows/flutter/generated_plugins.cmake
+**/windows/x64/
+**/windows/x86/
+
+**/linux/flutter/ephemeral/
+**/linux/flutter/generated_plugin_registrant.cc
+**/linux/flutter/generated_plugin_registrant.h
+**/linux/flutter/generated_plugins.cmake
+
+# Visual Studio Dosyaları
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# =====================================================================
+# 7. NODE.JS & BACKEND SUNUCU (okey-master-server)
+# =====================================================================
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Prisma & Generated Klasörler
+**/generated/prisma/
+okey-master-server/generated/
+
+# Arşiv & Sıkıştırılmış Dosyalar
+*.zip
+*.tar.gz
+okey-master-server.zip
+
+# Veritabanı Dosyaları / Dökümleri
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.db
+*.db-journal
+
+# =====================================================================
+# 8. GELİŞTİRİCİ ARAÇLARI & EDİTÖRLER (IDE)
+# =====================================================================
+.idea/
+**/.idea/
 *.iml
 *.ipr
 *.iws
-.idea/
 
-# Flutter / Dart
-.dart_tool/
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
+# VS Code & Cursor & Atom
+.vscode/
+**/.vscode/
+.cursor/
+**/.cursor/
+.fleet/
+.atom/
+
+# =====================================================================
+# 9. İŞLETİM SİSTEMİ & GEÇİCİ DOSYALAR
+# =====================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Yedek ve Geçici Dosyalar
+*.bak
+*.tmp
+*.swp
+*.swo
+*~
+.history

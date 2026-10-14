@@ -1,20 +1,38 @@
-node_modules
-# Keep environment variables out of version control
+# Ortam Değişkenleri
 .env
+.env.*
+!.env.example
 
-/generated/prisma
-
-# Ana dizindeki ve alt dizinlerdeki tüm node_modules klasörlerini engeller
-**/node_modules/
+# Bağımlılıklar
 node_modules/
 
-# Server içindeki Prisma tarafından üretilen dosyalar
-**/generated/prisma/
-okey-master-server/generated/prisma/
+# Prisma & Oluşturulan Kodlar
+generated/
+prisma/generated/
 
-# Local ortam değişkenleri (Şifreler vb.)
-.env
-okey-master-server/.env
+# Loglar
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
 
-# --- DİĞER ---
+# Test & Kapsam
+coverage/
+
+# Sertifika ve Anahtarlar
+*.pem
+*.key
+*.cert
+*.json.key
+
+# Arşivler
+*.zip
+*.tar.gz
 okey-master-server.zip
+
+# İşletim Sistemi & Editör
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
